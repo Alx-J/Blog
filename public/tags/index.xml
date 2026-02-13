@@ -6,8 +6,22 @@
     <description>Recent content in Tags on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 13 Nov 2025 07:16:45 +0000</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Easy</title>
+      <link>/tags/easy/</link>
+      <pubDate>Thu, 13 Nov 2025 07:16:45 +0000</pubDate>
+      <guid>/tags/easy/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Htb</title>
+      <link>/tags/htb/</link>
+      <pubDate>Thu, 13 Nov 2025 07:16:45 +0000</pubDate>
+      <guid>/tags/htb/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Bash</title>
       <link>/tags/bash/</link>
