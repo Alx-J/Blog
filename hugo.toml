@@ -108,6 +108,7 @@ pagination.pagerSize = 5
           name = "Projects"
           url = "https://github.com/Alx-J"
         [[languages.en.menu.main]]
-          identifier = "write-ups"
-          name = "Write-ups"
-          url = "/write-ups"
+          identifier = "htb-writeups"
+          name = "HTB-writeups"
+          url = "/htb-writeups"
+
