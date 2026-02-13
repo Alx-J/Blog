@@ -15,7 +15,7 @@ pagination.pagerSize = 5
   contentTypeName = "posts"
 
   # if you set this to 0, only submenu trigger will be visible
-  showMenuItems = 3
+  showMenuItems = 4
 
   # show selector to switch language
   showLanguageSelector = false
@@ -107,4 +107,8 @@ pagination.pagerSize = 5
           identifier = "projects"
           name = "Projects"
           url = "https://github.com/Alx-J"
+        [[languages.en.menu.main]]
+          identifier = "htb-writeups"
+          name = "HTB-writeups"
+          url = "/htb-writeups"
 
