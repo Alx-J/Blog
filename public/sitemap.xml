@@ -28,16 +28,20 @@
   </url><url>
     <loc>/about/about/</loc>
   </url><url>
-    <loc>/write_ups/write_ups/</loc>
+    <loc>/htb-writeups/htb-writeups/</loc>
+  </url><url>
+    <loc>/write-ups/write-ups/</loc>
   </url><url>
     <loc>/about/</loc>
   </url><url>
     <loc>/categories/</loc>
   </url><url>
-    <loc>/write_ups/cicada/</loc>
+    <loc>/htb-writeups/cicada/</loc>
   </url><url>
-    <loc>/tags/type/note/</loc>
+    <loc>/write-ups/cicada/</loc>
   </url><url>
-    <loc>/write_ups/</loc>
+    <loc>/htb-writeups/</loc>
+  </url><url>
+    <loc>/write-ups/</loc>
   </url>
 </urlset>
