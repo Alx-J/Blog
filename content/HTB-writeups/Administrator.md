@@ -38,9 +38,8 @@ By using evil-winrm we get a Powershell
 click on user oliva (you can see that by clicking on analysis and use queries)
 
 check node info 
-→ on <span style="color:rgb(255, 192, 0)">outbound object control header</span> it displays the account user has <span style="color:rgb(255, 192, 0)">First Degree Object Control(FDOC) 
-</span>when we click on it 
-→ it shows a way to user <span style="color:rgb(146, 208, 80)">michael</span> which is <span style="color:rgb(146, 208, 80)">Generic All</span>
+→ on outbound object control header it displays the account user has First Degree Object Control(FDOC)  when we click on it 
+→ it shows a way to user michael which is Generic All
   ⇒ means we have a permission to change password to user
   michael
    ⇒ using evil-winrm
@@ -76,7 +75,7 @@ we checked **emily** user's FDOC and it directs to **ethan** which is vulnerable
 
 kerberos attack where we retrieve kerberos ticket which is hash of the vulnerable user **ethan** kerberos is time-sensitive 
 
-we used <span style="color:rgb(255, 192, 0)">targetkerberoast.py</span> 
+we used targetkerberoast.py 
 ```
 python3 targetedKerberoast.py -d administrator.htb -u emily -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb'
 ```

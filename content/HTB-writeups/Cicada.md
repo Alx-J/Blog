@@ -59,7 +59,7 @@ it's run as a guest user on smb
  445    CICADA-DC        david.orelious 2024-03-14 12:17:29 0       Just in case I forget my password is aRt$Lp#7t*VQ!3 
 ```
 
- Run a `--shares` scan on `netexe` or `smbmap` with <span style="color:rgb(255, 192, 0)">david</span> creds
+ Run a `--shares` scan on `netexe` or `smbmap` with david creds
 
 ---
 ```
@@ -69,7 +69,7 @@ download the output of the shares.. without using smbclient
 
  ---
 # User flag
- Looked on <span style="color:rgb(255, 192, 0)">DEV</span> by <span style="color:rgb(255, 192, 0)">smbclient</span> which is readable by <span style="color:rgb(255, 192, 0)">david user</span> and we found a file which has 
+ Looked on DEV by smbclient which is readable by david user and we found a file which has 
 
 ```
 $username = "emily.oscars"
@@ -87,7 +87,7 @@ evil-winrm -i 10.10.10.10 -u emily.oscars -p 'Q!3@Lp#M6b*7t*Vt'
 
 
 # Root 
-Using creds to get a shell using <span style="color:rgb(255, 192, 0)">evil-winrm</span> and we see a privilege 
+Using creds to get a shell using evil-winrm and we see a privilege 
 
 ```
 SeBackupPrivilege

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dante&#39;s blog</title>
-    <link>//localhost:1313/</link>
-    <description>Recent content on Dante&#39;s blog</description>
+    <title>Htb-Writeups on Dante&#39;s blog</title>
+    <link>//localhost:1313/htb-writeups/</link>
+    <description>Recent content in Htb-Writeups on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sun, 26 Jan 2025 06:25:31 +0000</lastBuildDate>
-    <atom:link href="//localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//localhost:1313/htb-writeups/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Administrator</title>
       <link>//localhost:1313/htb-writeups/administrator/</link>
