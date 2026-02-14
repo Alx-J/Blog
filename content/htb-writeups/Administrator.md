@@ -1,5 +1,5 @@
 ---
-title: My Note Title
+title: Administrator
 date: 2025-01-26T06:25:31.000Z
 tags:
   - htb
