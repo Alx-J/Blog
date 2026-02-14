@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Dante&#39;s blog</title>
-    <link>//localhost:1313/tags/</link>
+    <link>/tags/</link>
     <description>Recent content in Tags on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Thu, 13 Nov 2025 07:16:45 +0000</lastBuildDate>
-    <atom:link href="//localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Easy</title>
-      <link>//localhost:1313/tags/easy/</link>
+      <link>/tags/easy/</link>
       <pubDate>Thu, 13 Nov 2025 07:16:45 +0000</pubDate>
-      <guid>//localhost:1313/tags/easy/</guid>
+      <guid>/tags/easy/</guid>
       <description></description>
     </item>
     <item>
       <title>Htb</title>
-      <link>//localhost:1313/tags/htb/</link>
+      <link>/tags/htb/</link>
       <pubDate>Thu, 13 Nov 2025 07:16:45 +0000</pubDate>
-      <guid>//localhost:1313/tags/htb/</guid>
+      <guid>/tags/htb/</guid>
       <description></description>
     </item>
     <item>
       <title>Bash</title>
-      <link>//localhost:1313/tags/bash/</link>
+      <link>/tags/bash/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>//localhost:1313/tags/bash/</guid>
+      <guid>/tags/bash/</guid>
       <description></description>
     </item>
     <item>
       <title>Linux</title>
-      <link>//localhost:1313/tags/linux/</link>
+      <link>/tags/linux/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>//localhost:1313/tags/linux/</guid>
+      <guid>/tags/linux/</guid>
       <description></description>
     </item>
     <item>
       <title>Nmap</title>
-      <link>//localhost:1313/tags/nmap/</link>
+      <link>/tags/nmap/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>//localhost:1313/tags/nmap/</guid>
+      <guid>/tags/nmap/</guid>
       <description></description>
     </item>
   </channel>

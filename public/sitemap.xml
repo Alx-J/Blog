@@ -2,48 +2,48 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>//localhost:1313/htb-writeups/cicada/</loc>
+    <loc>/htb-writeups/cicada/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/</loc>
+    <loc>/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/easy/</loc>
+    <loc>/tags/easy/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/htb/</loc>
+    <loc>/tags/htb/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/htb-writeups/</loc>
+    <loc>/htb-writeups/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/</loc>
+    <loc>/tags/</loc>
     <lastmod>2025-11-13T07:16:45+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/bash/</loc>
+    <loc>/tags/bash/</loc>
     <lastmod>2025-10-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/lazycat-/</loc>
+    <loc>/posts/lazycat-/</loc>
     <lastmod>2025-10-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/linux/</loc>
+    <loc>/tags/linux/</loc>
     <lastmod>2025-10-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/tags/nmap/</loc>
+    <loc>/tags/nmap/</loc>
     <lastmod>2025-10-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/</loc>
+    <loc>/posts/</loc>
     <lastmod>2025-10-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/posts/posts/</loc>
+    <loc>/posts/posts/</loc>
     <lastmod>2025-10-23T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>//localhost:1313/about/about/</loc>
+    <loc>/about/about/</loc>
   </url><url>
-    <loc>//localhost:1313/htb-writeups/htb-writeups/</loc>
+    <loc>/htb-writeups/htb-writeups/</loc>
   </url><url>
-    <loc>//localhost:1313/about/</loc>
+    <loc>/about/</loc>
   </url><url>
-    <loc>//localhost:1313/categories/</loc>
+    <loc>/categories/</loc>
   </url>
 </urlset>
