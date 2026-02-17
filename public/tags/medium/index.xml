@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Medium on Terminal</title>
-    <link>/tags/medium/</link>
-    <description>Recent content in Medium on Terminal</description>
+    <title>Medium on Dante&#39;s blog</title>
+    <link>//localhost:1313/tags/medium/</link>
+    <description>Recent content in Medium on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sun, 26 Jan 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="/tags/medium/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//localhost:1313/tags/medium/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Administrator</title>
-      <link>/htb-writeups/administrator/</link>
+      <link>//localhost:1313/htb-writeups/administrator/</link>
       <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>/htb-writeups/administrator/</guid>
+      <guid>//localhost:1313/htb-writeups/administrator/</guid>
       <description>&lt;p&gt;&lt;code&gt;Username: Olivia ~ Password: ichliebedich&lt;/code&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;h3 id=&#34;smb-recon&#34;&gt;SMB recon&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Administrator&#xA;Guest&#xA;krbtgt&#xA;olivia&#xA;michael&#xA;benjamin&#xA;emily&#xA;ethan&#xA;alexander&#xA;emma&#xA;( LockoutTries=0 PasswordMin=7 )&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;win-rm&#34;&gt;win-rm&lt;/h3&gt;&#xA;&lt;p&gt;By using evil-winrm we get a Powershell&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;net user&lt;/code&gt; → it will enumerate all users&#xA;&lt;code&gt;whoami /all&lt;/code&gt; → it will provide user info , group info, user priv info and user claims unknown&lt;/p&gt;&#xA;&lt;h1 id=&#34;user-flag&#34;&gt;User Flag&lt;/h1&gt;&#xA;&lt;h2 id=&#34;bloodhound&#34;&gt;Bloodhound&lt;/h2&gt;&#xA;&lt;p&gt;click on user oliva (you can see that by clicking on analysis and use queries)&lt;/p&gt;</description>
     </item>
   </channel>

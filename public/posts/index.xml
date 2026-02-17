@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Terminal</title>
-    <link>/posts/</link>
-    <description>Recent content in Posts on Terminal</description>
+    <title>Posts on Dante&#39;s blog</title>
+    <link>//localhost:1313/posts/</link>
+    <description>Recent content in Posts on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>LazyCat</title>
-      <link>/posts/lazycat/</link>
+      <link>//localhost:1313/posts/lazycat/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>/posts/lazycat/</guid>
+      <guid>//localhost:1313/posts/lazycat/</guid>
       <description>&lt;p&gt;We&amp;rsquo;ve all been there. It&amp;rsquo;s 1 AM, you&amp;rsquo;re deep into a Hack The Box machine, and you&amp;rsquo;ve just kicked off your initial recon. You run &lt;code&gt;nmap -p- &amp;lt;IP&amp;gt;&lt;/code&gt; to find all open ports&amp;hellip; and you wait.&lt;/p&gt;&#xA;&lt;p&gt;Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a &lt;em&gt;new&lt;/em&gt; command: &lt;code&gt;nmap -sC -sV -A -p 22,80,445 &amp;lt;IP&amp;gt;&lt;/code&gt;&amp;hellip; and you wait again.&lt;/p&gt;&#xA;&lt;p&gt;This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&amp;rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Hello</title>
-      <link>/posts/posts/</link>
+      <link>//localhost:1313/posts/posts/</link>
       <pubDate>Thu, 23 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>/posts/posts/</guid>
+      <guid>//localhost:1313/posts/posts/</guid>
       <description>&lt;p&gt;May your coffee kick in before reality does.&lt;/p&gt;</description>
     </item>
   </channel>

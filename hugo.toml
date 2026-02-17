@@ -11,7 +11,7 @@ pagination.pagerSize = 5
   contentTypeName = "posts"
 
   # if you set this to 0, only submenu trigger will be visible
-  showMenuItems = 2
+  showMenuItems = 4
 
   # show selector to switch language
   showLanguageSelector = false
@@ -20,7 +20,7 @@ pagination.pagerSize = 5
   fullWidthTheme = false
 
   # center theme with default width
-  centerTheme = false
+  centerTheme = true
 
   # if your resource directory contains an image called `cover.(jpg|png|webp)`,
   # then the file will be used as a cover automatically.
@@ -56,10 +56,10 @@ pagination.pagerSize = 5
 [languages]
   [languages.en]
     languageName = "English"
-    title = "Terminal"
+    title = "Dante's blog"
 
     [languages.en.params]
-      subtitle = "A simple, retro theme for Hugo"
+      subtitle = "Thought I was dead? Hah! Too bad!"
       owner = ""
       keywords = ""
       copyright = ""
@@ -74,7 +74,7 @@ pagination.pagerSize = 5
       words = "words"
 
       [languages.en.params.logo]
-        logoText = "Terminal"
+        logoText = "Home"
         logoHomeLink = "/"
 
       [languages.en.menu]
@@ -83,7 +83,14 @@ pagination.pagerSize = 5
           name = "About"
           url = "/about"
         [[languages.en.menu.main]]
-          identifier = "showcase"
-          name = "Showcase"
-          url = "/showcase"
-
+          identifier = "hackthebox-profile"
+          name = "HackTheBox-profile"
+          url = "https://app.hackthebox.com/users/627461"
+        [[languages.en.menu.main]]
+          identifier = "projects"
+          name = "Projects"
+          url = "https://github.com/Alx-J"
+        [[languages.en.menu.main]]
+          identifier = "htb-writeups"
+          name = "HTB-writeups"
+          url = "/htb-writeups"

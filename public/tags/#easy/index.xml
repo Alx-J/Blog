@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>#Easy on Terminal</title>
-    <link>/tags/%23easy/</link>
-    <description>Recent content in #Easy on Terminal</description>
+    <title>#Easy on Dante&#39;s blog</title>
+    <link>//localhost:1313/tags/%23easy/</link>
+    <description>Recent content in #Easy on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sat, 25 Jan 2025 09:26:06 +0000</lastBuildDate>
-    <atom:link href="/tags/%23easy/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//localhost:1313/tags/%23easy/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Cicada</title>
-      <link>/htb-writeups/cicada/</link>
+      <link>//localhost:1313/htb-writeups/cicada/</link>
       <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
-      <guid>/htb-writeups/cicada/</guid>
+      <guid>//localhost:1313/htb-writeups/cicada/</guid>
       <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;open ports&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;80&lt;/span&gt; - http&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;445&lt;/span&gt; - smb&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;smb-recon&#34;&gt;SMB recon&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;smbclient \\10.10.10.10\ -L &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Sharename       Type      Comment&#xA; ---------       ----      -------&#xA;  ADMIN$          Disk      Remote Admin&#xA;   C$              Disk      Default share&#xA;  DEV             Disk      &#xA;  HR              Disk      &#xA;  IPC$            IPC       Remote IPC&#xA; NETLOGON        Disk      Logon server share &#xA;SYSVOL          Disk      Logon server share &#xA; from HR share we got a file &#xA; Your default password is: Cicada$M6Corpb*@Lp#nZp!8&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;netexec&#34;&gt;netexec&lt;/h3&gt;&#xA;&lt;p&gt;it&amp;rsquo;s run as a guest user on smb&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;nxc smb 10.10.10.10 -u &amp;#39;&amp;#39; --rid-brute&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;500: CICADA\Administrator (SidTypeUser)&#xA;501: CICADA\Guest (SidTypeUser)&#xA;502: CICADA\krbtgt (SidTypeUser)&#xA;1000: CICADA\CICADA-DC$ (SidTypeUser)&#xA;1104: CICADA\john.smoulder (SidTypeUser)&#xA;1105: CICADA\sarah.dantelia (SidTypeUser)&#xA;1106: CICADA\michael.wrightson(SidTypeUser)  → default password for this we used just creds.txt files on netexec &#xA;1108: CICADA\david.orelious (SidTypeUser)&#xA;1601: CICADA\emily.oscars (SidTypeUser) -- users with the creds &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Findings:&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
   </channel>

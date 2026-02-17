@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Terminal</title>
-    <link>/tags/</link>
-    <description>Recent content in Tags on Terminal</description>
+    <title>Tags on Dante&#39;s blog</title>
+    <link>//localhost:1313/tags/</link>
+    <description>Recent content in Tags on Dante&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bash</title>
-      <link>/tags/bash/</link>
+      <link>//localhost:1313/tags/bash/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/bash/</guid>
+      <guid>//localhost:1313/tags/bash/</guid>
       <description></description>
     </item>
     <item>
       <title>Linux</title>
-      <link>/tags/linux/</link>
+      <link>//localhost:1313/tags/linux/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/linux/</guid>
+      <guid>//localhost:1313/tags/linux/</guid>
       <description></description>
     </item>
     <item>
       <title>Nmap</title>
-      <link>/tags/nmap/</link>
+      <link>//localhost:1313/tags/nmap/</link>
       <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/nmap/</guid>
+      <guid>//localhost:1313/tags/nmap/</guid>
       <description></description>
     </item>
     <item>
       <title>Htb</title>
-      <link>/tags/htb/</link>
+      <link>//localhost:1313/tags/htb/</link>
       <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/htb/</guid>
+      <guid>//localhost:1313/tags/htb/</guid>
       <description></description>
     </item>
     <item>
       <title>Medium</title>
-      <link>/tags/medium/</link>
+      <link>//localhost:1313/tags/medium/</link>
       <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/medium/</guid>
+      <guid>//localhost:1313/tags/medium/</guid>
       <description></description>
     </item>
     <item>
       <title>#Easy</title>
-      <link>/tags/%23easy/</link>
+      <link>//localhost:1313/tags/%23easy/</link>
       <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
-      <guid>/tags/%23easy/</guid>
+      <guid>//localhost:1313/tags/%23easy/</guid>
       <description></description>
     </item>
     <item>
       <title>#Htb</title>
-      <link>/tags/%23htb/</link>
+      <link>//localhost:1313/tags/%23htb/</link>
       <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
-      <guid>/tags/%23htb/</guid>
+      <guid>//localhost:1313/tags/%23htb/</guid>
       <description></description>
     </item>
   </channel>
