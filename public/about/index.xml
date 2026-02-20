@@ -1,5 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Abouts on Dante's blog</title><link>/about/</link><description>Recent content in Abouts on Dante's blog</description><generator>Hugo</generator><language>en</language><atom:link href="/about/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>/about/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/about/about/</guid><description>&lt;p&gt;&lt;strong&gt;ABOUT ME&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="/images/b007f0adc278a79dcc7e4807bdf41629.jpg" alt="Image Description"&gt;&lt;/p&gt;
-&lt;p&gt;The name&amp;rsquo;s Dante.
-A cybersecurity student.
-I do things. Sometimes they&amp;rsquo;re badass. Sometimes they&amp;rsquo;re a disaster.&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Abouts on Dante&#39;s blog</title>
+    <link>http://localhost:1313/about/</link>
+    <description>Recent content in Abouts on Dante&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <atom:link href="http://localhost:1313/about/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title></title>
+      <link>http://localhost:1313/about/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/about/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;ABOUT ME&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/b007f0adc278a79dcc7e4807bdf41629.jpg&#34; alt=&#34;Image Description&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;The name&amp;rsquo;s Dante.&#xA;A cybersecurity student.&#xA;I do things. Sometimes they&amp;rsquo;re badass. Sometimes they&amp;rsquo;re a disaster.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,57 +1,68 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dante's blog</title><link>/</link><description>Recent content on Dante's blog</description><generator>Hugo</generator><language>en</language><lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>LazyCat</title><link>/posts/lazycat/</link><pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/lazycat/</guid><description>&lt;p&gt;We&amp;rsquo;ve all been there. It&amp;rsquo;s 1 AM, you&amp;rsquo;re deep into a Hack The Box machine, and you&amp;rsquo;ve just kicked off your initial recon. You run &lt;code&gt;nmap -p- &amp;lt;IP&amp;gt;&lt;/code&gt; to find all open ports&amp;hellip; and you wait.&lt;/p&gt;
-&lt;p&gt;Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a &lt;em&gt;new&lt;/em&gt; command: &lt;code&gt;nmap -sC -sV -A -p 22,80,445 &amp;lt;IP&amp;gt;&lt;/code&gt;&amp;hellip; and you wait again.&lt;/p&gt;
-&lt;p&gt;This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&amp;rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.&lt;/p&gt;</description></item><item><title>Hello</title><link>/posts/posts/</link><pubDate>Thu, 23 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/posts/</guid><description>&lt;p&gt;May your coffee kick in before reality does.&lt;/p&gt;</description></item><item><title>Administrator</title><link>/htb-writeups/administrator/</link><pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate><guid>/htb-writeups/administrator/</guid><description>&lt;p&gt;&lt;code&gt;Username: Olivia ~ Password: ichliebedich&lt;/code&gt;&lt;/p&gt;
-&lt;h1 id="initial-recon"&gt;Initial Recon&lt;/h1&gt;
-&lt;h3 id="smb-recon"&gt;SMB recon&lt;/h3&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;Administrator
-Guest
-krbtgt
-olivia
-michael
-benjamin
-emily
-ethan
-alexander
-emma
-( LockoutTries=0 PasswordMin=7 )
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="win-rm"&gt;win-rm&lt;/h3&gt;
-&lt;p&gt;By using evil-winrm we get a Powershell&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;net user&lt;/code&gt; → it will enumerate all users
-&lt;code&gt;whoami /all&lt;/code&gt; → it will provide user info , group info, user priv info and user claims unknown&lt;/p&gt;
-&lt;h1 id="user-flag"&gt;User Flag&lt;/h1&gt;
-&lt;h2 id="bloodhound"&gt;Bloodhound&lt;/h2&gt;
-&lt;p&gt;click on user oliva (you can see that by clicking on analysis and use queries)&lt;/p&gt;</description></item><item><title>Cicada</title><link>/htb-writeups/cicada/</link><pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate><guid>/htb-writeups/cicada/</guid><description>&lt;h1 id="initial-recon"&gt;Initial Recon&lt;/h1&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;open ports
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;80&lt;/span&gt; - http
-&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;445&lt;/span&gt; - smb
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="smb-recon"&gt;SMB recon&lt;/h3&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;smbclient \\10.10.10.10\ -L 
-&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;Sharename Type Comment
- --------- ---- -------
- ADMIN$ Disk Remote Admin
- C$ Disk Default share
- DEV Disk 
- HR Disk 
- IPC$ IPC Remote IPC
- NETLOGON Disk Logon server share 
-SYSVOL Disk Logon server share 
- from HR share we got a file 
- Your default password is: Cicada$M6Corpb*@Lp#nZp!8
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="netexec"&gt;netexec&lt;/h3&gt;
-&lt;p&gt;it&amp;rsquo;s run as a guest user on smb&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;nxc smb 10.10.10.10 -u &amp;#39;&amp;#39; --rid-brute
-&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;500: CICADA\Administrator (SidTypeUser)
-501: CICADA\Guest (SidTypeUser)
-502: CICADA\krbtgt (SidTypeUser)
-1000: CICADA\CICADA-DC$ (SidTypeUser)
-1104: CICADA\john.smoulder (SidTypeUser)
-1105: CICADA\sarah.dantelia (SidTypeUser)
-1106: CICADA\michael.wrightson(SidTypeUser) → default password for this we used just creds.txt files on netexec 
-1108: CICADA\david.orelious (SidTypeUser)
-1601: CICADA\emily.oscars (SidTypeUser) -- users with the creds 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Findings:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title/><link>/about/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/about/about/</guid><description>&lt;p&gt;&lt;strong&gt;ABOUT ME&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="/images/b007f0adc278a79dcc7e4807bdf41629.jpg" alt="Image Description"&gt;&lt;/p&gt;
-&lt;p&gt;The name&amp;rsquo;s Dante.
-A cybersecurity student.
-I do things. Sometimes they&amp;rsquo;re badass. Sometimes they&amp;rsquo;re a disaster.&lt;/p&gt;</description></item><item><title/><link>/htb-writeups/htb-writeups/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/htb-writeups/htb-writeups/</guid><description>&lt;p&gt;May your coffee kick in before reality does.&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dante&#39;s blog</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on Dante&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LazyCat</title>
+      <link>http://localhost:1313/posts/lazycat/</link>
+      <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lazycat/</guid>
+      <description>&lt;p&gt;We&amp;rsquo;ve all been there. It&amp;rsquo;s 1 AM, you&amp;rsquo;re deep into a Hack The Box machine, and you&amp;rsquo;ve just kicked off your initial recon. You run &lt;code&gt;nmap -p- &amp;lt;IP&amp;gt;&lt;/code&gt; to find all open ports&amp;hellip; and you wait.&lt;/p&gt;&#xA;&lt;p&gt;Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a &lt;em&gt;new&lt;/em&gt; command: &lt;code&gt;nmap -sC -sV -A -p 22,80,445 &amp;lt;IP&amp;gt;&lt;/code&gt;&amp;hellip; and you wait again.&lt;/p&gt;&#xA;&lt;p&gt;This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&amp;rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Hello</title>
+      <link>http://localhost:1313/posts/posts/</link>
+      <pubDate>Thu, 23 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/posts/</guid>
+      <description>&lt;p&gt;May your coffee kick in before reality does.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Administrator</title>
+      <link>http://localhost:1313/htb-writeups/administrator/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/administrator/</guid>
+      <description>&lt;p&gt;&lt;code&gt;Username: Olivia ~ Password: ichliebedich&lt;/code&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;h3 id=&#34;smb-recon&#34;&gt;SMB recon&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Administrator&#xA;Guest&#xA;krbtgt&#xA;olivia&#xA;michael&#xA;benjamin&#xA;emily&#xA;ethan&#xA;alexander&#xA;emma&#xA;( LockoutTries=0 PasswordMin=7 )&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;win-rm&#34;&gt;win-rm&lt;/h3&gt;&#xA;&lt;p&gt;By using evil-winrm we get a Powershell&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;net user&lt;/code&gt; → it will enumerate all users&#xA;&lt;code&gt;whoami /all&lt;/code&gt; → it will provide user info , group info, user priv info and user claims unknown&lt;/p&gt;&#xA;&lt;h1 id=&#34;user-flag&#34;&gt;User Flag&lt;/h1&gt;&#xA;&lt;h2 id=&#34;bloodhound&#34;&gt;Bloodhound&lt;/h2&gt;&#xA;&lt;p&gt;click on user oliva (you can see that by clicking on analysis and use queries)&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Alert</title>
+      <link>http://localhost:1313/htb-writeups/alert/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/alert/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;We found there are two forbidden directories and some other accessible files&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;→ /uploads&#xA;→ /messages &#xA;→ messages.php&#xA;→ contact&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;So we got a home web page where we can upload .md file&lt;/p&gt;&#xA;&lt;p&gt;Using burp we figure out how it executing script&#xA;we used&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt; &amp;lt;/body&amp;gt; &amp;lt;script&amp;gt;alert(&amp;#39;xss&amp;#39;) &amp;lt;/script&amp;gt;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and confirmed it is vulnerable&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;/body&amp;gt; ⇒ we used this so the &amp;lt;script&amp;gt; could execute out side of the &amp;lt;body&amp;gt;&#x9;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ and we figured out the file we uploading is saved on the database and we can share it using a link that is provided to view it.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Sightless</title>
+      <link>http://localhost:1313/htb-writeups/sightless/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/sightless/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;we found three ports&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;21 → ftp (which kick us out)&#xA;22 → ssh &#xA;80 → http&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;subdomain-enum&#34;&gt;subdomain enum&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ffuf -c -u http://sightless.htb/ -H &amp;#34;HOST: FUZZ.sightless.htb&amp;#34; -w /path/to/your/preferred/wordlist &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ for subdomain enumeration we used two wordlist they both might work&lt;/p&gt;&#xA;&lt;p&gt;→ /usr/share/seclists/Discovery/DNS/dns-Jhaddix.txt&lt;/p&gt;&#xA;&lt;p&gt;→/usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt&lt;/p&gt;&#xA;&lt;p&gt;but the wordlist is too big so we filtered based on first letter it using grep&lt;/p&gt;&#xA;&lt;p&gt;we know it show&amp;rsquo;s they gave a service sqlpad so out of guess we used &lt;code&gt;s&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Cicada</title>
+      <link>http://localhost:1313/htb-writeups/cicada/</link>
+      <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/cicada/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;open ports&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;80&lt;/span&gt; - http&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;445&lt;/span&gt; - smb&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;smb-recon&#34;&gt;SMB recon&lt;/h3&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;smbclient \\10.10.10.10\ -L &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Sharename       Type      Comment&#xA; ---------       ----      -------&#xA;  ADMIN$          Disk      Remote Admin&#xA;   C$              Disk      Default share&#xA;  DEV             Disk      &#xA;  HR              Disk      &#xA;  IPC$            IPC       Remote IPC&#xA; NETLOGON        Disk      Logon server share &#xA;SYSVOL          Disk      Logon server share &#xA; from HR share we got a file &#xA; Your default password is: Cicada$M6Corpb*@Lp#nZp!8&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;netexec&#34;&gt;netexec&lt;/h3&gt;&#xA;&lt;p&gt;it&amp;rsquo;s run as a guest user on smb&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;nxc smb 10.10.10.10 -u &amp;#39;&amp;#39; --rid-brute&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;500: CICADA\Administrator (SidTypeUser)&#xA;501: CICADA\Guest (SidTypeUser)&#xA;502: CICADA\krbtgt (SidTypeUser)&#xA;1000: CICADA\CICADA-DC$ (SidTypeUser)&#xA;1104: CICADA\john.smoulder (SidTypeUser)&#xA;1105: CICADA\sarah.dantelia (SidTypeUser)&#xA;1106: CICADA\michael.wrightson(SidTypeUser)  → default password for this we used just creds.txt files on netexec &#xA;1108: CICADA\david.orelious (SidTypeUser)&#xA;1601: CICADA\emily.oscars (SidTypeUser) -- users with the creds &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Findings:&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/about/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/about/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;ABOUT ME&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/b007f0adc278a79dcc7e4807bdf41629.jpg&#34; alt=&#34;Image Description&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;The name&amp;rsquo;s Dante.&#xA;A cybersecurity student.&#xA;I do things. Sometimes they&amp;rsquo;re badass. Sometimes they&amp;rsquo;re a disaster.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/htb-writeups/htb-writeups/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/htb-writeups/</guid>
+      <description>&lt;p&gt;May your coffee kick in before reality does.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

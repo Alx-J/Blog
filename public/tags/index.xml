@@ -1,1 +1,75 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tags on Dante's blog</title><link>/tags/</link><description>Recent content in Tags on Dante's blog</description><generator>Hugo</generator><language>en</language><lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml"/><item><title>Bash</title><link>/tags/bash/</link><pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate><guid>/tags/bash/</guid><description/></item><item><title>Linux</title><link>/tags/linux/</link><pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate><guid>/tags/linux/</guid><description/></item><item><title>Nmap</title><link>/tags/nmap/</link><pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate><guid>/tags/nmap/</guid><description/></item><item><title>Htb</title><link>/tags/htb/</link><pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate><guid>/tags/htb/</guid><description/></item><item><title>Medium</title><link>/tags/medium/</link><pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate><guid>/tags/medium/</guid><description/></item><item><title>#Easy</title><link>/tags/%23easy/</link><pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate><guid>/tags/%23easy/</guid><description/></item><item><title>#Htb</title><link>/tags/%23htb/</link><pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate><guid>/tags/%23htb/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Dante&#39;s blog</title>
+    <link>http://localhost:1313/tags/</link>
+    <description>Recent content in Tags on Dante&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bash</title>
+      <link>http://localhost:1313/tags/bash/</link>
+      <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/bash/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Linux</title>
+      <link>http://localhost:1313/tags/linux/</link>
+      <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/linux/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Nmap</title>
+      <link>http://localhost:1313/tags/nmap/</link>
+      <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/nmap/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Easy</title>
+      <link>http://localhost:1313/tags/easy/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/easy/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Htb</title>
+      <link>http://localhost:1313/tags/htb/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/htb/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Medium</title>
+      <link>http://localhost:1313/tags/medium/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/medium/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows</title>
+      <link>http://localhost:1313/tags/windows/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/windows/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>#Easy</title>
+      <link>http://localhost:1313/tags/%23easy/</link>
+      <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
+      <guid>http://localhost:1313/tags/%23easy/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>#Htb</title>
+      <link>http://localhost:1313/tags/%23htb/</link>
+      <pubDate>Sat, 25 Jan 2025 09:26:06 +0000</pubDate>
+      <guid>http://localhost:1313/tags/%23htb/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

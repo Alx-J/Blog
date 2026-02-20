@@ -1,22 +1,315 @@
-<!doctype html><html lang=en><head><title>LazyCat :: Dante's blog</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run nmap -p- <IP> to find all open ports&mldr; and you wait.
-Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a new command: nmap -sC -sV -A -p 22,80,445 <IP>&mldr; and you wait again.
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  
+    <title>LazyCat :: Dante&#39;s blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run nmap -p- &lt;IP&gt; to find all open ports&hellip; and you wait.
+Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a new command: nmap -sC -sV -A -p 22,80,445 &lt;IP&gt;&hellip; and you wait again.
 This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.
-"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=/posts/lazycat/><link rel=stylesheet href=/css/buttons.min.86f6b4c106b6c6eb690ae5203d36b442c1f66f718ff4e8164fa86cf6c61ad641.css><link rel=stylesheet href=/css/code.min.d529ea4b2fb8d34328d7d31afc5466d5f7bc2f0bc9abdd98b69385335d7baee4.css><link rel=stylesheet href=/css/fonts.min.5bb7ed13e1d00d8ff39ea84af26737007eb5051b157b86fc24487c94f3dc8bbe.css><link rel=stylesheet href=/css/footer.min.eb8dfc2c6a7eafa36cd3ba92d63e69e849e2200e0002a228d137f236b09ecd75.css><link rel=stylesheet href=/css/gist.min.a751e8b0abe1ba8bc53ced52a38b19d8950fe78ca29454ea8c2595cf26aad5c0.css><link rel=stylesheet href=/css/header.min.75c7eb0e2872d95ff48109c6647d0223a38db52e2561dd87966eb5fc7c6bdac6.css><link rel=stylesheet href=/css/main.min.36833afd348409fc6c3d09d0897c5833d9d5bf1ff31f5e60ea3ee42ce2b1268c.css><link rel=stylesheet href=/css/menu.min.3c17467ebeb3d38663dce68f71f519901124fa5cbb4519b2fb0667a21e9aca39.css><link rel=stylesheet href=/css/pagination.min.bbb986dbce00a5ce5aca0504b7925fc1c581992a4bf57f163e5d69cc1db7d836.css><link rel=stylesheet href=/css/post.min.e6dddd258e64c83e05cec0cd49c05216742d42fc8ecbfbe6b67083412b609bd3.css><link rel=stylesheet href=/css/syntax.min.a0773cce9310cb6d8ed23e50f005448facf29a53001b57e038828daa466b25c0.css><link rel=stylesheet href=/css/terminal.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css><link rel=stylesheet href=/css/terms.min.b81791663c3790e738e571cdbf802312390d30e4b1d8dc9d814a5b5454d0ac11.css><link rel=stylesheet href=/terminal.css><link rel="shortcut icon" href=/favicon.png><link rel=apple-touch-icon href=/apple-touch-icon.png><meta name=twitter:card content="summary"><meta name=twitter:site content><meta name=twitter:creator content><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content="LazyCat"><meta property="og:description" content="We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run nmap -p- <IP> to find all open ports&mldr; and you wait.
-Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a new command: nmap -sC -sV -A -p 22,80,445 <IP>&mldr; and you wait again.
+" />
+<meta name="keywords" content="" />
+
+  <meta name="robots" content="noodp" />
+
+<link rel="canonical" href="http://localhost:1313/posts/lazycat/" />
+
+
+
+
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/buttons.min.86f6b4c106b6c6eb690ae5203d36b442c1f66f718ff4e8164fa86cf6c61ad641.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/code.min.d529ea4b2fb8d34328d7d31afc5466d5f7bc2f0bc9abdd98b69385335d7baee4.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/fonts.min.5bb7ed13e1d00d8ff39ea84af26737007eb5051b157b86fc24487c94f3dc8bbe.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/footer.min.eb8dfc2c6a7eafa36cd3ba92d63e69e849e2200e0002a228d137f236b09ecd75.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/gist.min.a751e8b0abe1ba8bc53ced52a38b19d8950fe78ca29454ea8c2595cf26aad5c0.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/header.min.75c7eb0e2872d95ff48109c6647d0223a38db52e2561dd87966eb5fc7c6bdac6.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/main.min.36833afd348409fc6c3d09d0897c5833d9d5bf1ff31f5e60ea3ee42ce2b1268c.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/menu.min.3c17467ebeb3d38663dce68f71f519901124fa5cbb4519b2fb0667a21e9aca39.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/pagination.min.bbb986dbce00a5ce5aca0504b7925fc1c581992a4bf57f163e5d69cc1db7d836.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/post.min.e6dddd258e64c83e05cec0cd49c05216742d42fc8ecbfbe6b67083412b609bd3.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/syntax.min.a0773cce9310cb6d8ed23e50f005448facf29a53001b57e038828daa466b25c0.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/terminal.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css">
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/terms.min.b81791663c3790e738e571cdbf802312390d30e4b1d8dc9d814a5b5454d0ac11.css">
+
+
+<link rel="stylesheet" href="http://localhost:1313/terminal.css">
+
+
+
+
+<link rel="shortcut icon" href="http://localhost:1313/favicon.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+
+
+<meta name="twitter:card" content="summary" />
+
+  
+    <meta name="twitter:site" content="" />
+  
+    <meta name="twitter:creator" content="" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="LazyCat">
+<meta property="og:description" content="We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run nmap -p- &lt;IP&gt; to find all open ports&hellip; and you wait.
+Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a new command: nmap -sC -sV -A -p 22,80,445 &lt;IP&gt;&hellip; and you wait again.
 This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.
-"><meta property="og:url" content="/posts/lazycat/"><meta property="og:site_name" content="Dante's blog"><meta property="og:image" content="/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta property="article:published_time" content="2025-10-25 00:00:00 +0000 UTC"></head><body><div class="container center"><header class=header><div class=header__inner><div class=header__logo><a href=/><div class=logo>Home</div></a></div><ul class="menu menu--mobile"><li class=menu__trigger>Menu&nbsp;▾</li><li><ul class=menu__dropdown><li><a href=/about>About</a></li><li><a href=https://app.hackthebox.com/users/627461>HackTheBox-profile</a></li><li><a href=/htb-writeups>HTB-writeups</a></li><li><a href=https://github.com/Alx-J>Projects</a></li></ul></li></ul></div><nav class=navigation-menu><ul class="navigation-menu__inner menu--desktop"><li><a href=/about>About</a></li><li><a href=https://app.hackthebox.com/users/627461>HackTheBox-profile</a></li><li><a href=/htb-writeups>HTB-writeups</a></li><li><a href=https://github.com/Alx-J>Projects</a></li></ul></nav></header><div class=content><article class=post><h1 class=post-title><a href=/posts/lazycat/>LazyCat</a></h1><div class=post-meta><time class=post-date>2025-10-25</time></div><span class=post-tags>#<a href=/tags/linux/>linux</a>&nbsp;
-#<a href=/tags/bash/>bash</a>&nbsp;
-#<a href=/tags/nmap/>nmap</a>&nbsp;</span><div class=post-content><div><p>We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run <code>nmap -p- &lt;IP></code> to find all open ports&mldr; and you wait.</p><p>Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a <em>new</em> command: <code>nmap -sC -sV -A -p 22,80,445 &lt;IP></code>&mldr; and you wait again.</p><p>This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.</p><p>So, I built <strong>LazyCat</strong>.</p><h2 id=what-is-lazycat>What is LazyCat?<a href=#what-is-lazycat class=hanchor arialabel=Anchor>#</a></h2><p>LazyCat is a super simple Bash script that automates my personal Nmap workflow. It&rsquo;s not a complex framework; it&rsquo;s a &ldquo;fire and forget&rdquo; tool designed to do one thing well: <strong>get you the detailed scan results you need, fast.</strong></p><p>It&rsquo;s built to be the first thing you run against a new box.</p><h2 id=how-it-works>How It Works<a href=#how-it-works class=hanchor arialabel=Anchor>#</a></h2><p>The logic is simple, but it saves a ton of time. When you run <code>lazycat &lt;IP_ADDRESS></code>, here&rsquo;s what happens under the hood:</p><ol><li><p><strong>Phase 1: Fast TCP Port Scan</strong>
-It first runs a very fast, all-ports scan (<code>nmap -p- --min-rate=5000</code>) and saves the output to a temporary file. This just hunts for <em>any</em> open TCP port.</p></li><li><p><strong>Phase 2: Automated Port Extraction</strong>
-This is the key. The script immediately parses that temp file, extracts <em>only</em> the open port numbers, and formats them into a comma-separated list (e.g., <code>21,22,80,445</code>).</p></li><li><p><strong>Phase 3: Detailed TCP Scan</strong>
-It instantly feeds that port list into a new, detailed Nmap scan (<code>nmap -p&lt;ports> -A</code>). This runs service version detection, script scanning, OS detection, and traceroute <em>only</em> on the ports we know are open. This detailed output is saved to <code>scan_results.txt</code>.</p></li><li><p><strong>Phase 4: Quick UDP Scan</strong>
-Finally, it runs a quick, separate UDP scan (<code>nmap -sU -sV -F -open</code>) to catch common low-hanging fruit like SNMP or TFTP, saving the results to <code>udp_scan_results.txt</code>.</p></li></ol><p>That&rsquo;s it. You run one command, grab a coffee, and come back to two clean-text files with all your initial recon done.</p><h2 id=why-your-life-just-got-better>Why Your Life Just Got Better<a href=#why-your-life-just-got-better class=hanchor arialabel=Anchor>#</a></h2><ul><li><strong>No More Manual Work:</strong> It completely eliminates that annoying manual port extraction step.</li><li><strong>Consistent Scans:</strong> Ensures you run the same, thorough scanning methodology every single time.</li><li><strong>Saves Time:</strong> You&rsquo;re not waiting to interact with the terminal; you&rsquo;re running the detailed scan the <em>second</em> the first port is found.</li><li><strong>Full Coverage:</strong> You get both a deep-dive on TCP and a quick check on UDP without thinking about it.</li></ul><h2 id=get-it-now-installation>Get It Now (Installation)<a href=#get-it-now-installation class=hanchor arialabel=Anchor>#</a></h2><p>Installation is a 3-line copy-paste job.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Download the script</span>
-</span></span><span style=display:flex><span>curl -L https://raw.githubusercontent.com/Alx-J/lazyc4t/main/lazycat.sh -o lazycat
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Make it executable</span>
-</span></span><span style=display:flex><span>chmod +x lazycat
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Move it to your path so you can call it from anywhere</span>
-</span></span><span style=display:flex><span>sudo mv lazycat /usr/local/bin/
-</span></span></code></pre></div></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Read other posts</span><hr></div><div class=pagination__buttons><a href=/posts/posts/ class="button inline next">[<span class=button__text>Hello</span>] ></a></div></div></article></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2026 Powered by <a href=https://gohugo.io>Hugo</a></span>
-<span>:: <a href=https://github.com/panr/hugo-theme-terminal target=_blank>Theme</a> made by <a href=https://github.com/panr target=_blank>panr</a></span></div></div></footer><script type=text/javascript src=/bundle.min.js></script></div></body></html>
+" />
+<meta property="og:url" content="http://localhost:1313/posts/lazycat/" />
+<meta property="og:site_name" content="Dante&#39;s blog" />
+
+  <meta property="og:image" content="http://localhost:1313/og-image.png">
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+
+
+  <meta property="article:published_time" content="2025-10-25 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+
+
+<div class="container center">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/">
+  <div class="logo">
+    Home
+  </div>
+</a>
+
+    </div>
+    
+      <ul class="menu menu--mobile">
+  <li class="menu__trigger">Menu&nbsp;▾</li>
+  <li>
+    <ul class="menu__dropdown">
+      
+        
+          <li><a href="/about">About</a></li>
+        
+      
+        
+          <li><a href="https://app.hackthebox.com/users/627461">HackTheBox-profile</a></li>
+        
+      
+        
+          <li><a href="/htb-writeups">HTB-writeups</a></li>
+        
+      
+        
+          <li><a href="https://github.com/Alx-J">Projects</a></li>
+        
+      
+      
+    </ul>
+  </li>
+</ul>
+
+    
+    
+  </div>
+  
+    <nav class="navigation-menu">
+  <ul class="navigation-menu__inner menu--desktop">
+    
+      
+        
+          <li><a href="/about" >About</a></li>
+        
+      
+        
+          <li><a href="https://app.hackthebox.com/users/627461" >HackTheBox-profile</a></li>
+        
+      
+        
+          <li><a href="/htb-writeups" >HTB-writeups</a></li>
+        
+      
+        
+          <li><a href="https://github.com/Alx-J" >Projects</a></li>
+        
+      
+      
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<article class="post">
+  <h1 class="post-title">
+    <a href="http://localhost:1313/posts/lazycat/">LazyCat</a>
+  </h1>
+  <div class="post-meta"><time class="post-date">2025-10-25</time></div>
+
+  
+    <span class="post-tags">
+      
+      #<a href="http://localhost:1313/tags/linux/">linux</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/bash/">bash</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/nmap/">nmap</a>&nbsp;
+      
+    </span>
+  
+  
+
+
+  
+
+  <div class="post-content"><div>
+        <p>We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run <code>nmap -p- &lt;IP&gt;</code> to find all open ports&hellip; and you wait.</p>
+<p>Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a <em>new</em> command: <code>nmap -sC -sV -A -p 22,80,445 &lt;IP&gt;</code>&hellip; and you wait again.</p>
+<p>This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.</p>
+<p>So, I built <strong>LazyCat</strong>.</p>
+<h2 id="what-is-lazycat">What is LazyCat?<a href="#what-is-lazycat" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>LazyCat is a super simple Bash script that automates my personal Nmap workflow. It&rsquo;s not a complex framework; it&rsquo;s a &ldquo;fire and forget&rdquo; tool designed to do one thing well: <strong>get you the detailed scan results you need, fast.</strong></p>
+<p>It&rsquo;s built to be the first thing you run against a new box.</p>
+<h2 id="how-it-works">How It Works<a href="#how-it-works" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>The logic is simple, but it saves a ton of time. When you run <code>lazycat &lt;IP_ADDRESS&gt;</code>, here&rsquo;s what happens under the hood:</p>
+<ol>
+<li>
+<p><strong>Phase 1: Fast TCP Port Scan</strong>
+It first runs a very fast, all-ports scan (<code>nmap -p- --min-rate=5000</code>) and saves the output to a temporary file. This just hunts for <em>any</em> open TCP port.</p>
+</li>
+<li>
+<p><strong>Phase 2: Automated Port Extraction</strong>
+This is the key. The script immediately parses that temp file, extracts <em>only</em> the open port numbers, and formats them into a comma-separated list (e.g., <code>21,22,80,445</code>).</p>
+</li>
+<li>
+<p><strong>Phase 3: Detailed TCP Scan</strong>
+It instantly feeds that port list into a new, detailed Nmap scan (<code>nmap -p&lt;ports&gt; -A</code>). This runs service version detection, script scanning, OS detection, and traceroute <em>only</em> on the ports we know are open. This detailed output is saved to <code>scan_results.txt</code>.</p>
+</li>
+<li>
+<p><strong>Phase 4: Quick UDP Scan</strong>
+Finally, it runs a quick, separate UDP scan (<code>nmap -sU -sV -F -open</code>) to catch common low-hanging fruit like SNMP or TFTP, saving the results to <code>udp_scan_results.txt</code>.</p>
+</li>
+</ol>
+<p>That&rsquo;s it. You run one command, grab a coffee, and come back to two clean-text files with all your initial recon done.</p>
+<h2 id="why-your-life-just-got-better">Why Your Life Just Got Better<a href="#why-your-life-just-got-better" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<ul>
+<li><strong>No More Manual Work:</strong> It completely eliminates that annoying manual port extraction step.</li>
+<li><strong>Consistent Scans:</strong> Ensures you run the same, thorough scanning methodology every single time.</li>
+<li><strong>Saves Time:</strong> You&rsquo;re not waiting to interact with the terminal; you&rsquo;re running the detailed scan the <em>second</em> the first port is found.</li>
+<li><strong>Full Coverage:</strong> You get both a deep-dive on TCP and a quick check on UDP without thinking about it.</li>
+</ul>
+<h2 id="get-it-now-installation">Get It Now (Installation)<a href="#get-it-now-installation" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>Installation is a 3-line copy-paste job.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Download the script</span>
+</span></span><span style="display:flex;"><span>curl -L https://raw.githubusercontent.com/Alx-J/lazyc4t/main/lazycat.sh -o lazycat
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make it executable</span>
+</span></span><span style="display:flex;"><span>chmod +x lazycat
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Move it to your path so you can call it from anywhere</span>
+</span></span><span style="display:flex;"><span>sudo mv lazycat /usr/local/bin/
+</span></span></code></pre></div>
+      </div></div>
+
+  
+    
+<div class="pagination">
+  <div class="pagination__title">
+    <span class="pagination__title-h">Read other posts</span>
+    <hr />
+  </div>
+  <div class="pagination__buttons">
+    
+    
+    
+      <a href="http://localhost:1313/posts/posts/" class="button inline next">
+         [<span class="button__text">Hello</span>] &gt;
+      </a>
+    
+  </div>
+</div>
+
+
+  
+
+  
+    
+
+  
+</article>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright">
+        <span>© 2026 Powered by <a href="https://gohugo.io">Hugo</a></span>
+    
+      <span>:: <a href="https://github.com/panr/hugo-theme-terminal" target="_blank">Theme</a> made by <a href="https://github.com/panr" target="_blank">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<script type="text/javascript" src="/bundle.min.js"></script>
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

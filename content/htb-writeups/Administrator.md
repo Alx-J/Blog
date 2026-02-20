@@ -5,6 +5,7 @@ draft: false
 tags:
   - htb
   - medium
+  - windows
 ---
 
 `Username: Olivia ~ Password: ichliebedich`

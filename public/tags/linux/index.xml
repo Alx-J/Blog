@@ -1,3 +1,33 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Dante's blog</title><link>/tags/linux/</link><description>Recent content in Linux on Dante's blog</description><generator>Hugo</generator><language>en</language><lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>LazyCat</title><link>/posts/lazycat/</link><pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/lazycat/</guid><description>&lt;p&gt;We&amp;rsquo;ve all been there. It&amp;rsquo;s 1 AM, you&amp;rsquo;re deep into a Hack The Box machine, and you&amp;rsquo;ve just kicked off your initial recon. You run &lt;code&gt;nmap -p- &amp;lt;IP&amp;gt;&lt;/code&gt; to find all open ports&amp;hellip; and you wait.&lt;/p&gt;
-&lt;p&gt;Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a &lt;em&gt;new&lt;/em&gt; command: &lt;code&gt;nmap -sC -sV -A -p 22,80,445 &amp;lt;IP&amp;gt;&lt;/code&gt;&amp;hellip; and you wait again.&lt;/p&gt;
-&lt;p&gt;This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&amp;rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on Dante&#39;s blog</title>
+    <link>http://localhost:1313/tags/linux/</link>
+    <description>Recent content in Linux on Dante&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 25 Oct 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LazyCat</title>
+      <link>http://localhost:1313/posts/lazycat/</link>
+      <pubDate>Sat, 25 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/lazycat/</guid>
+      <description>&lt;p&gt;We&amp;rsquo;ve all been there. It&amp;rsquo;s 1 AM, you&amp;rsquo;re deep into a Hack The Box machine, and you&amp;rsquo;ve just kicked off your initial recon. You run &lt;code&gt;nmap -p- &amp;lt;IP&amp;gt;&lt;/code&gt; to find all open ports&amp;hellip; and you wait.&lt;/p&gt;&#xA;&lt;p&gt;Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a &lt;em&gt;new&lt;/em&gt; command: &lt;code&gt;nmap -sC -sV -A -p 22,80,445 &amp;lt;IP&amp;gt;&lt;/code&gt;&amp;hellip; and you wait again.&lt;/p&gt;&#xA;&lt;p&gt;This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&amp;rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Alert</title>
+      <link>http://localhost:1313/htb-writeups/alert/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/alert/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;We found there are two forbidden directories and some other accessible files&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;→ /uploads&#xA;→ /messages &#xA;→ messages.php&#xA;→ contact&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;So we got a home web page where we can upload .md file&lt;/p&gt;&#xA;&lt;p&gt;Using burp we figure out how it executing script&#xA;we used&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt; &amp;lt;/body&amp;gt; &amp;lt;script&amp;gt;alert(&amp;#39;xss&amp;#39;) &amp;lt;/script&amp;gt;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and confirmed it is vulnerable&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;/body&amp;gt; ⇒ we used this so the &amp;lt;script&amp;gt; could execute out side of the &amp;lt;body&amp;gt;&#x9;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ and we figured out the file we uploading is saved on the database and we can share it using a link that is provided to view it.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Sightless</title>
+      <link>http://localhost:1313/htb-writeups/sightless/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/sightless/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;we found three ports&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;21 → ftp (which kick us out)&#xA;22 → ssh &#xA;80 → http&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;subdomain-enum&#34;&gt;subdomain enum&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ffuf -c -u http://sightless.htb/ -H &amp;#34;HOST: FUZZ.sightless.htb&amp;#34; -w /path/to/your/preferred/wordlist &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ for subdomain enumeration we used two wordlist they both might work&lt;/p&gt;&#xA;&lt;p&gt;→ /usr/share/seclists/Discovery/DNS/dns-Jhaddix.txt&lt;/p&gt;&#xA;&lt;p&gt;→/usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt&lt;/p&gt;&#xA;&lt;p&gt;but the wordlist is too big so we filtered based on first letter it using grep&lt;/p&gt;&#xA;&lt;p&gt;we know it show&amp;rsquo;s they gave a service sqlpad so out of guess we used &lt;code&gt;s&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

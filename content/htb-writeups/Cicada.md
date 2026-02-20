@@ -5,6 +5,7 @@ draft: false
 tags:
   - "#htb"
   - "#easy"
+  - windows
 ---
 
 

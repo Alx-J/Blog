@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Easy on Dante&#39;s blog</title>
+    <link>http://localhost:1313/tags/easy/</link>
+    <description>Recent content in Easy on Dante&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 26 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/easy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Alert</title>
+      <link>http://localhost:1313/htb-writeups/alert/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/alert/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;We found there are two forbidden directories and some other accessible files&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;→ /uploads&#xA;→ /messages &#xA;→ messages.php&#xA;→ contact&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;So we got a home web page where we can upload .md file&lt;/p&gt;&#xA;&lt;p&gt;Using burp we figure out how it executing script&#xA;we used&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt; &amp;lt;/body&amp;gt; &amp;lt;script&amp;gt;alert(&amp;#39;xss&amp;#39;) &amp;lt;/script&amp;gt;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and confirmed it is vulnerable&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;/body&amp;gt; ⇒ we used this so the &amp;lt;script&amp;gt; could execute out side of the &amp;lt;body&amp;gt;&#x9;&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ and we figured out the file we uploading is saved on the database and we can share it using a link that is provided to view it.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Sightless</title>
+      <link>http://localhost:1313/htb-writeups/sightless/</link>
+      <pubDate>Sun, 26 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/htb-writeups/sightless/</guid>
+      <description>&lt;h1 id=&#34;initial-recon&#34;&gt;Initial Recon&lt;/h1&gt;&#xA;&lt;p&gt;we found three ports&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;21 → ftp (which kick us out)&#xA;22 → ssh &#xA;80 → http&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;subdomain-enum&#34;&gt;subdomain enum&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ffuf -c -u http://sightless.htb/ -H &amp;#34;HOST: FUZZ.sightless.htb&amp;#34; -w /path/to/your/preferred/wordlist &#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;→ for subdomain enumeration we used two wordlist they both might work&lt;/p&gt;&#xA;&lt;p&gt;→ /usr/share/seclists/Discovery/DNS/dns-Jhaddix.txt&lt;/p&gt;&#xA;&lt;p&gt;→/usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt&lt;/p&gt;&#xA;&lt;p&gt;but the wordlist is too big so we filtered based on first letter it using grep&lt;/p&gt;&#xA;&lt;p&gt;we know it show&amp;rsquo;s they gave a service sqlpad so out of guess we used &lt;code&gt;s&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
