@@ -10,9 +10,9 @@ tags:
 
 
 # Initial Recon
-```bash
-open ports
 
+open ports
+```
 80 - http
 445 - smb
 ```
