@@ -194,19 +194,19 @@
     
       <article class="post on-list">
         <h2 class="post-title">
-          <a href="http://localhost:1313/posts/lazycat/">LazyCat</a>
+          <a href="http://localhost:1313/htb-writeups/administrator/">Administrator</a>
         </h2>
 
-        <div class="post-meta"><time class="post-date">2025-10-25</time></div>
+        <div class="post-meta"><time class="post-date">2025-01-26</time></div>
 
         
           <span class="post-tags">
             
-            #<a href="http://localhost:1313/tags/linux/">linux</a>&nbsp;
+            #<a href="http://localhost:1313/tags/htb/">htb</a>&nbsp;
             
-            #<a href="http://localhost:1313/tags/bash/">bash</a>&nbsp;
+            #<a href="http://localhost:1313/tags/medium/">medium</a>&nbsp;
             
-            #<a href="http://localhost:1313/tags/nmap/">nmap</a>&nbsp;
+            #<a href="http://localhost:1313/tags/windows/">windows</a>&nbsp;
             
           </span>
         
@@ -216,25 +216,201 @@
 
         <div class="post-content">
           
-            <p>We&rsquo;ve all been there. It&rsquo;s 1 AM, you&rsquo;re deep into a Hack The Box machine, and you&rsquo;ve just kicked off your initial recon. You run <code>nmap -p- &lt;IP&gt;</code> to find all open ports&hellip; and you wait.</p>
-<p>Then, the scan finishes. You squint at the output, manually copy-pasting the 3 or 4 open ports into a <em>new</em> command: <code>nmap -sC -sV -A -p 22,80,445 &lt;IP&gt;</code>&hellip; and you wait again.</p>
-<p>This manual step of grabbing ports, re-typing commands, and wasting precious minutes was driving me crazy. It&rsquo;s a small thing, but it breaks your flow. It was born out of pure frustration during those late-night sessions. I wanted to stop wasting time on repetitive scanning and focus on what actually matters—getting root.</p>
+            <p><code>Username: Olivia ~ Password: ichliebedich</code></p>
+<h1 id="initial-recon">Initial Recon</h1>
+<h3 id="smb-recon">SMB recon</h3>
+<pre tabindex="0"><code>Administrator
+Guest
+krbtgt
+olivia
+michael
+benjamin
+emily
+ethan
+alexander
+emma
+( LockoutTries=0 PasswordMin=7 )
+</code></pre><h3 id="win-rm">win-rm</h3>
+<p>By using evil-winrm we get a Powershell</p>
+<p><code>net user</code> → it will enumerate all users
+<code>whoami /all</code> → it will provide user info , group info, user priv info and user claims unknown</p>
+<h1 id="user-flag">User Flag</h1>
+<h2 id="bloodhound">Bloodhound</h2>
+<p>click on user oliva (you can see that by clicking on analysis and use queries)</p>
           
         </div>
 
         
           <div>
-            <a class="read-more button inline" href="/posts/lazycat/">[Read more]</a>
+            <a class="read-more button inline" href="/htb-writeups/administrator/">[Read more]</a>
           </div>
         
       </article>
     
       <article class="post on-list">
         <h2 class="post-title">
-          <a href="http://localhost:1313/posts/posts/">Hello</a>
+          <a href="http://localhost:1313/htb-writeups/alert/">Alert</a>
         </h2>
 
-        <div class="post-meta"><time class="post-date">2025-10-23</time></div>
+        <div class="post-meta"><time class="post-date">2025-01-26</time></div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/tags/htb/">htb</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/easy/">easy</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/linux/">linux</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+
+        <div class="post-content">
+          
+            <h1 id="initial-recon">Initial Recon</h1>
+<p>We found there are two forbidden directories and some other accessible files</p>
+<pre tabindex="0"><code>→ /uploads
+→ /messages 
+→ messages.php
+→ contact
+</code></pre><p>So we got a home web page where we can upload .md file</p>
+<p>Using burp we figure out how it executing script
+we used</p>
+<pre tabindex="0"><code> &lt;/body&gt; &lt;script&gt;alert(&#39;xss&#39;) &lt;/script&gt;
+</code></pre><p>and confirmed it is vulnerable</p>
+<pre tabindex="0"><code>&lt;/body&gt; ⇒ we used this so the &lt;script&gt; could execute out side of the &lt;body&gt;	
+</code></pre><p>→ and we figured out the file we uploading is saved on the database and we can share it using a link that is provided to view it.</p>
+          
+        </div>
+
+        
+          <div>
+            <a class="read-more button inline" href="/htb-writeups/alert/">[Read more]</a>
+          </div>
+        
+      </article>
+    
+      <article class="post on-list">
+        <h2 class="post-title">
+          <a href="http://localhost:1313/htb-writeups/sightless/">Sightless</a>
+        </h2>
+
+        <div class="post-meta"><time class="post-date">2025-01-26</time></div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/tags/htb/">htb</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/easy/">easy</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/linux/">linux</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+
+        <div class="post-content">
+          
+            <h1 id="initial-recon">Initial Recon</h1>
+<p>we found three ports</p>
+<pre tabindex="0"><code>21 → ftp (which kick us out)
+22 → ssh 
+80 → http
+</code></pre><h2 id="subdomain-enum">subdomain enum</h2>
+<pre tabindex="0"><code>ffuf -c -u http://sightless.htb/ -H &#34;HOST: FUZZ.sightless.htb&#34; -w /path/to/your/preferred/wordlist 
+</code></pre><p>→ for subdomain enumeration we used two wordlist they both might work</p>
+<p>→ /usr/share/seclists/Discovery/DNS/dns-Jhaddix.txt</p>
+<p>→/usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt</p>
+<p>but the wordlist is too big so we filtered based on first letter it using grep</p>
+<p>we know it show&rsquo;s they gave a service sqlpad so out of guess we used <code>s</code></p>
+          
+        </div>
+
+        
+          <div>
+            <a class="read-more button inline" href="/htb-writeups/sightless/">[Read more]</a>
+          </div>
+        
+      </article>
+    
+      <article class="post on-list">
+        <h2 class="post-title">
+          <a href="http://localhost:1313/htb-writeups/cicada/">Cicada</a>
+        </h2>
+
+        <div class="post-meta"><time class="post-date">2025-01-25</time></div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/tags/#htb/">#htb</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/#easy/">#easy</a>&nbsp;
+            
+            #<a href="http://localhost:1313/tags/windows/">windows</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+
+        <div class="post-content">
+          
+            <h1 id="initial-recon">Initial Recon</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>open ports
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">80</span> - http
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">445</span> - smb
+</span></span></code></pre></div><h3 id="smb-recon">SMB recon</h3>
+<pre tabindex="0"><code>smbclient \\10.10.10.10\ -L 
+</code></pre><pre tabindex="0"><code>Sharename       Type      Comment
+ ---------       ----      -------
+  ADMIN$          Disk      Remote Admin
+   C$              Disk      Default share
+  DEV             Disk      
+  HR              Disk      
+  IPC$            IPC       Remote IPC
+ NETLOGON        Disk      Logon server share 
+SYSVOL          Disk      Logon server share 
+ from HR share we got a file 
+ Your default password is: Cicada$M6Corpb*@Lp#nZp!8
+</code></pre><h3 id="netexec">netexec</h3>
+<p>it&rsquo;s run as a guest user on smb</p>
+<pre tabindex="0"><code>nxc smb 10.10.10.10 -u &#39;&#39; --rid-brute
+</code></pre><pre tabindex="0"><code>500: CICADA\Administrator (SidTypeUser)
+501: CICADA\Guest (SidTypeUser)
+502: CICADA\krbtgt (SidTypeUser)
+1000: CICADA\CICADA-DC$ (SidTypeUser)
+1104: CICADA\john.smoulder (SidTypeUser)
+1105: CICADA\sarah.dantelia (SidTypeUser)
+1106: CICADA\michael.wrightson(SidTypeUser)  → default password for this we used just creds.txt files on netexec 
+1108: CICADA\david.orelious (SidTypeUser)
+1601: CICADA\emily.oscars (SidTypeUser) -- users with the creds 
+</code></pre><p><strong>Findings:</strong></p>
+          
+        </div>
+
+        
+          <div>
+            <a class="read-more button inline" href="/htb-writeups/cicada/">[Read more]</a>
+          </div>
+        
+      </article>
+    
+      <article class="post on-list">
+        <h2 class="post-title">
+          <a href="http://localhost:1313/htb-writeups/htb-writeups/"></a>
+        </h2>
+
+        <div class="post-meta"></div>
 
         
 
@@ -249,7 +425,7 @@
 
         
           <div>
-            <a class="read-more button inline" href="/posts/posts/">[Read more]</a>
+            <a class="read-more button inline" href="/htb-writeups/htb-writeups/">[Read more]</a>
           </div>
         
       </article>
