@@ -1,13 +1,10 @@
-baseurl = "https://0xdante.vercel.app/"
+baseurl = "/"
 languageCode = "en-us"
 # Add it only if you keep the theme in the `themes` directory.
 # Remove it if you use the theme as a remote Hugo Module.
-# theme = "themes/terminal"
+theme = "terminal"
 pagination.pagerSize = 5
 
-[module]
-  [[module.imports]]
-    path = "/opt/build/repo/themes/terminal"
 
 [params]
   # dir name of your main content (default is `content/posts`).
