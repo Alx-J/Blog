@@ -25,11 +25,11 @@ So we got a home web page where we can upload .md file
 ## Burp suite
 
 We confirmed it is vulnerable 
-![[/image/alertscr.png]]
 
+![[alertsrc.png]]
 → And we figured out the file we uploading is saved on the `database` and we can **share it using a link** that is provided to view it.
 
-![[/images/alert1.png]]
+![[alert1.png]]
 
 → Then we went to the contact page where we can able to send a message to admin
 
@@ -117,7 +117,7 @@ Then change it to `../../../../etc/apache2/sites-available/000-default.conf`
 ⇒ To check for `apache configuration` 
 ⇒`authenticated user credentials` stored directory path mentioned there 
 
-![[/images/alert2.png]]
+![[alert2.png]]
 
 ⇒ `/var/www/statistics.alert.htb/.htpasswd`
    
