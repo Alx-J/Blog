@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function Hero({ postCount = 0 }, { proCount = 0 }) {
+export default function Hero({ postCount = 0, proCount = 0 }) {
   return (
     <section className="hero">
       <div className="hero-bg" />

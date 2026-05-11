@@ -28,7 +28,7 @@ export default function Home({ posts, projects }) {
       </Head>
 
       <Navbar />
-      <Hero postCount={posts?.length || 0} />
+      <Hero postCount={posts?.length || 0} proCount={projects?.length || 0} />
 
       {posts?.length > 0 && <FeaturedPost post={posts[0]} />}
 
