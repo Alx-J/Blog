@@ -7,6 +7,17 @@ import { getAllPostsFromGitHub, getPostFromGitHub } from '../../lib/github';
 import { parseFrontmatter, buildPostMeta, estimateReadTime, renderMarkdown } from '../../lib/markdown';
 
 export default function BlogPost({ post }) {
+  // ── Hooks must always be called before any conditional return ──
+  useEffect(() => {
+    if (!post) return;
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, [post]);
+
   if (!post) {
     return (
       <>
@@ -18,15 +29,6 @@ export default function BlogPost({ post }) {
       </>
     );
   }
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
 
   return (
     <>

@@ -97,13 +97,13 @@ export default function AdminDashboard() {
   return (
     <>
       <Head>
-        <title>Admin — DANTE</title>
+        <title>Admin — DEVIL&apos;S EDGE</title>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
 
       <div className="admin-page">
         <nav className="nav scrolled">
-          <Link href="/" className="nav-logo"><div className="logo-mark">A</div></Link>
+          <Link href="/" className="nav-logo"><div className="logo-mark">D</div>DEVIL&apos;S EDGE</Link>
           <span style={{ fontFamily: "'Share Tech Mono'", fontSize: '0.62rem', letterSpacing: '0.3em', color: 'var(--red)', textTransform: 'uppercase' }}>
             Admin Panel
           </span>
@@ -190,6 +190,7 @@ export default function AdminDashboard() {
                   <div className="image-grid">
                     {images.map(img => (
                       <div className="image-thumb" key={img.name} title={img.name}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={img.url} alt={img.name} />
                         <div className="image-thumb-overlay">
                           <span className="image-thumb-name">{img.name}</span>
