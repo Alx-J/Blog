@@ -33,7 +33,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 9999; background
 .hero-shard { position: absolute; z-index: 0; right: -100px; top: 0; bottom: 0; width: 40%; background: linear-gradient(135deg, transparent 40%, rgba(100,0,0,0.12) 100%); clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%); }
 .hero-orb { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(ellipse, rgba(180,0,0,0.08) 0%, transparent 70%); top: 50%; left: 60%; transform: translate(-50%,-50%); animation: orb-pulse 4s ease-in-out infinite; z-index: 0; }
 @keyframes orb-pulse { 0%,100% { transform:translate(-50%,-50%) scale(1);opacity:.7 } 50% { transform:translate(-50%,-50%) scale(1.1);opacity:1 } }
-.hero-content { position: relative; z-index: 1; max-width: 900px; width: 100%; }
+.hero-content { position: relative; z-index: 1; max-width: 900px; }
 .hero-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 0.4em; color: var(--red); text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; opacity: 0; animation: fade-up 0.8s 0.2s forwards; flex-wrap: wrap; }
 .hero-eyebrow::before { content: ''; display: block; width: 40px; height: 1px; background: var(--red); flex-shrink: 0; }
 .hero-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(2.8rem, 8vw, 7rem); font-weight: 900; line-height: 0.95; margin-bottom: 0.5rem; opacity: 0; animation: fade-up 0.8s 0.4s forwards; }
