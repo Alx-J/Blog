@@ -54,7 +54,7 @@ The target accepted the proposal with a valid transform:
 - `LifeDuration=28800` seconds
 - Extended features: `XAUTH` and `Dead Peer Detection`
 
-The **PSK** authentication method confirmed a pre-shared key was in play — a promising target for offline cracking. One handshake returned with zero notifies, meaning the transform was valid.
+The **PSK** authentication method confirmed a pre-shared key was in play — a promising target for offline cracking — and one handshake returned with zero notifies, meaning the transform was valid.
 
 ## Aggressive Mode Extraction
 
@@ -99,14 +99,14 @@ cat access.log.1 | grep htb
 offramp.expressway.htb
 ```
 
-Sudo version check:
+Checking the sudo version:
 
 ```bash
 sudo -V
 Sudo version 1.9.17
 ```
 
-Research identified **exploit-db 52354** — sudo's `-h` flag can be abused to impersonate another hostname and inherit its sudoers policy. The `offramp` host held `NOPASSWD: ALL` for `ike`.
+Research identified **exploit-db 52354**: sudo's `-h` flag can be abused to impersonate another hostname and inherit its sudoers policy. The `offramp` host held `NOPASSWD: ALL` for `ike`.
 
 Following the exploit steps:
 
