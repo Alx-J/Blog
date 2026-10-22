@@ -25,22 +25,16 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 9.75 seconds
 ```
 
-Got a sub-domain -> `admin.usage.htb`
+The scan revealed a sub-domain: `admin.usage.htb`
 
 Sub-directories:
 - `/register`
 - `/login`
 - `/forgot-password`
 
-Register new user and login as the user:
-- nothing interesting
+Registering a new account and logging in as that user turned up nothing interesting. So we moved on to the forgot-password page, which requires an email — a valid email returns a "link sent to mail" message, while an invalid one errors out.
 
-Exploring the forgot password page which requires email:
-- valid email - works (Msg: link sent to mail)
-- Non-valid email - error
-
-Try playing with the input field (email field):
-- Use `'` on every input field to check for a **server error 500** 
+Playing with the input field, we threw a `'` at every input to check for a **server error 500**:
 
 Guess the syntax works like this:
 
@@ -72,8 +66,7 @@ sqlmap -r request.txt -p email --batch --level=5 --risk=3 --threads=10 -D usage_
 sqlmap -r request.txt -p email --batch --level=5 --risk=3 --threads=10 -D usage_blog -T admin_users --dump
 ```
 
-- We gained the **password** hash of the admin user
-- Cracked the password using hashcat
+We gained the **password** hash of the admin user and cracked it with hashcat:
 
 > `Administrator - whatever1`
 
@@ -86,17 +79,17 @@ We got the versions of installed packages and dependency -> **Laravel version 10
 
 # User
 
-- Upload a php revshell with content named as image
+We uploaded a php revshell with content named as image.
 
 Gained shell as user **dash**
 
-On the home directory of dash there's a **hidden** file **monitrc**
+In the home directory of dash there's a **hidden** file **monitrc**
 
 > Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 
 By reviewing `.monitrc`, we saw creds `admin - 3nc0d3d_pa$$w0rd`
 
-Reuse the password for the other user xander and it worked:
+Reusing the password for the other user xander worked:
 
 > `xander - 3nc0d3d_pa$$w0rd`
 
@@ -110,13 +103,13 @@ sudo -l
 (ALL : ALL) NOPASSWD: /usr/bin/usage_management
 ```
 
-- Looks like a linux executable file:
+Checking the binary, it's a linux executable:
 
 ```sh
 file /usr/bin/usage_management
 ```
 
-- Copy the hash value and search on the **virus total** site to check for submission:
+We copied the hash value and checked it on the **VirusTotal** site for existing submissions:
 
 ```sh
 md5sum /usr/bin/usage_management
@@ -147,18 +140,11 @@ Invalid choice.
 ...<SNIP>...
 ```
 
-- Looks like option 1 changes into `/var/www/html` 
+Option 1 changes the working directory to `/var/www/html` before archiving.
 
-By looking at the strings we understood there's an error handling function:
+The strings also reveal an error handling function. The `7za` runs (if an error didn't occur) to create a file `/var/backups`, where `-snl` stores links as links — which means we can't just write a link to `/root` into `/var/www/html`.
 
-- The `7za` runs (if an error didn't occur) to create a file `/var/backups`
-	- `-snl` -> means to store links as links
-
-- So we can't just write a link to `/root` into `/var/www/html`
-
-
-Exploit:
-wildcards (`*`) in commands are often dangerous. Searching for "**7za** wildcard exploit":
+Exploit: wildcards (`*`) in commands are often dangerous. Searching for "**7za** wildcard exploit":
 
 > reference: https://hacktricks.wiki/linux-hardening/interesting-files-permissions/wildcards-spare-tricks.html?highlight=7z#7-zip--7z--7za
 
