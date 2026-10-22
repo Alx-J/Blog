@@ -1,1 +1,3 @@
-nmap says &lt;script src="x" async=""&gt; ok
+```text
+&lt;script src="x.js" async=""&gt;
+```
