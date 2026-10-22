@@ -1,1 +1,1 @@
-only closing tag </script> here
+nmap says &lt;script src="x" async=""&gt; ok
