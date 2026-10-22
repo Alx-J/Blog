@@ -59,11 +59,11 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ## Browser-Context SSRF
 
-The downloadable sample was a Chrome extension on **manifest version 3** — the developer-facing format:
+The downloadable sample was a Chrome extension built on **manifest version 3**:
 
 > Reference: https://github.com/sastraadiwiguna-purpleeliteteaming/Dissecting-CVE-2026-0628-Chromium-Extension-Privilege-Escalation
 
-Monitoring the developer's browsing activity surfaced the internal hostname **browserinternal.htb**, running a **Flask** application. Registered an account on the internal **Gitea 1.24.5** instance and found a public repository: **MarkdownPreview**.
+Monitoring the developer's browsing activity surfaced the internal hostname **browserinternal.htb**, running a **Flask** application. Registering an account on the internal **Gitea 1.24.5** instance turned up a public repository, **MarkdownPreview**.
 
 Source review of `app.py` showed a `routines` function that executes `routines.sh`:
 
@@ -102,7 +102,7 @@ fi
 
 ```
 
-The script is vulnerable to **command injection** — reaching it means calling the `routines` function from the extension itself.
+The script is vulnerable to **command injection** — but reaching it means calling the `routines` function from the extension itself.
 
 > Reference: https://stackoverflow.com/questions/34712552/what-is-the-purpose-of-background-js-on-a-chrome-extension
 
@@ -157,7 +157,7 @@ User larry may run the following commands on browsed:
 
 The `__pycache__` directory is writable by larry. The tool imports a local library, **extension_utils** — and Python writes its compiled cache there on every execution.
 
-Since the actual module source can't be edited, the plan: build a malicious replacement and swap it into the cache, keeping the legitimate `.pyc` header — Python validates those first 16 bytes before executing.
+Since the module source itself can't be edited, the plan was to build a malicious replacement and swap it into the cache while keeping the legitimate `.pyc` header — Python validates those first 16 bytes before executing.
 
 Compile the fake module:
 
