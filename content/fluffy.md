@@ -17,10 +17,7 @@ j.fleischman : J0elTHEM4n1990!
 ```
 
 ```bash
-nmap -p53,88,139,389,445,464,593,636,3268,3269,5985,9389,49668,49689,49690,49692,49707,49726,49761 -A -oN scan_results.txt 10.10.11.69
-```
-
-```text
+# Nmap 7.94SVN scan initiated Fri Jul 18 21:53:05 2025 as: /usr/lib/nmap/nmap -p53,88,139,389,445,464,593,636,3268,3269,5985,9389,49668,49689,49690,49692,49707,49726,49761 -A -oN scan_results.txt 10.10.11.69
 Nmap scan report for fluffy.htb (10.10.11.69)
 Host is up (0.27s latency).
 
@@ -91,7 +88,6 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Fri Jul 18 21:54:56 2025 -- 1 IP address (1 host up) scanned in 110.70 seconds
 ```
-
 Standard domain controller stack — Kerberos, LDAP, SMB, WinRM. SMB enumeration with the provided credentials listed domain users:
 
 ```text
