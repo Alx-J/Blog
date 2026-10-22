@@ -12,11 +12,8 @@ tags:
 
 A UDP sweep surfaced the actual attack surface — ISAKMP on `500/udp` alongside TFTP and NAT-T:
 
-```bash
-nmap -sU -sV -F -open -oN udp_scan_results.txt 10.10.11.87
-```
-
-```text
+```bash 
+# Nmap 7.95 scan initiated Wed Oct 29 18:13:14 2025 as: /usr/lib/nmap/nmap -sU -sV -F -open -oN udp_scan_results.txt 10.10.11.87
 Nmap scan report for expressway.htb (10.10.11.87)
 Host is up (0.50s latency).
 Not shown: 96 closed udp ports (port-unreach)
@@ -33,7 +30,7 @@ SF:0\0\0\x20\x01\x01\0\0\x80\x01\0\x05\x80\x02\0\x02\x80\x04\0\x02\x80\x03
 SF:\0\x01\x80\x0b\0\x01\x80\x0c\0\x01\r\0\0\x0c\t\0&\x89\xdf\xd6\xb7\x12\0
 SF:\0\0\x14\xaf\xca\xd7\x13h\xa1\xf1\xc9k\x86\x96\xfcwW\x01\0")%r(IPSEC_ST
 SF:ART,9C,"1'\xfc\xb08\x10\x9e\x89\?S\xbcLE\x9c\x9a\xbc\x01\x10\x02\0\0\0\
-SF:0\0\0\0\x9c\r\0\x004\0\0\0\x01\0\0\0\x01\0\0\0\(\x01\x01\0\x01\0\0\0\
+SF:0\0\0\0\0\x9c\r\0\x004\0\0\0\x01\0\0\0\x01\0\0\0\(\x01\x01\0\x01\0\0\0\
 SF:x20\x01\x01\0\0\x80\x01\0\x05\x80\x02\0\x02\x80\x04\0\x02\x80\x03\0\x03
 SF:\x80\x0b\0\x01\x80\x0c\x0e\x10\r\0\0\x0c\t\0&\x89\xdf\xd6\xb7\x12\r\0\0
 SF:\x14\xaf\xca\xd7\x13h\xa1\xf1\xc9k\x86\x96\xfcwW\x01\0\r\0\0\x18@H\xb7\
@@ -43,7 +40,6 @@ SF:\x80\x91>\xbbin\x08c\x81\xb5\xecB{\x1f");
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Wed Oct 29 18:17:10 2025 -- 1 IP address (1 host up) scanned in 235.74 seconds
 ```
-
 IKE on `500/udp` handles security association negotiation through ISAKMP — the standard framework for IPsec VPN key and authentication exchange.
 
 ## ike-scan
