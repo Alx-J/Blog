@@ -52,7 +52,7 @@ Introspection is wide open on the GraphQL endpoint:
 
 > https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/GraphQL%20Injection
 
-Enum through the schema until the user table shows itself:
+Enum through the schema until the user table turns up:
 
 `helpme@helpme.com : godhelpmeplz`
 
@@ -68,7 +68,7 @@ Version shows as 1.0.2 in the footer.
 
 # User
 
-HelpdeskZ 1.0.2 — prone to 2 vulnerabilities. We're using the authenticated SQL injection:
+HelpdeskZ 1.0.2 has two known vulnerabilities — we're using the authenticated SQL injection:
 
 > https://www.exploit-db.com/exploits/41200
 
@@ -670,12 +670,9 @@ $ uname -r
 
 Exploit 44298 is a Linux kernel local privilege escalation affecting Ubuntu 16.04 and kernel versions < 4.4.0-116. It's identified as CVE-2017-16995 and exploits a flaw in the **netfilter subsystem** within the Linux kernel's **iptables** module.
 
-**Root Cause**: Out-of-bounds (OOB) memory access in netfilter/iptables kernel module
+**Root Cause**: out-of-bounds (OOB) memory access in the netfilter/iptables kernel module
 
-Attack Method:
-- Two-stage exploit (decr.c + pwn.c)
-- Stage 1: Manipulates kernel object reference counts via malicious setsockopt calls
-- Stage 2: Exploits corrupted kernel state to gain arbitrary code execution
+Attack Method: a two-stage exploit (decr.c + pwn.c) — stage 1 manipulates kernel object reference counts through malicious setsockopt calls, and stage 2 exploits the corrupted kernel state to gain arbitrary code execution.
 
 Transfer the exploit to the target, compile it there, and run it:
 
