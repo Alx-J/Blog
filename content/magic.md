@@ -45,8 +45,7 @@ OS and Service detection performed. Please report any incorrect results at https
 301      GET        9l       28w      315c http://magic.htb/images/uploads => http://magic.htb/images/uploads/
 ```
 
-- Website with a login page at `/login.php`
-- Both fields take SQL injection — the same comment in both fields bypasses auth as admin (watch the spacing):
+The site has a login page at `/login.php`, and both fields take SQL injection — the same comment in both fields bypasses auth as admin (watch the spacing):
 
 ```sql
 ' OR 1=1-- -
@@ -56,22 +55,15 @@ OS and Service detection performed. Please report any incorrect results at https
 ' OR 1=1#
 ```
 
-- Behind the login there's `/upload.php` accepting jpg, jpeg & PNG
-- Uploads land in `/images/uploads` and are served from there
+Behind the login there's `/upload.php` accepting jpg, jpeg & PNG. Uploads land in `/images/uploads` and are served from there.
 
 ---
 
 > **Note** : an **Apache directive** — `<FilesMatch ".+\.php">` — treats any file with `.php` in its name differently.
 
-Upload a file called `webshell.php.png` to a web server:
+Upload a file called `webshell.php.png` to a web server. What you think: "This is a picture file (ends in `.png`), so it should just be displayed as an image." What the server thinks (with `".+\.php"`): "This filename contains `.php` in it, so I'll run it as PHP code!" So even though the file looks like a `.png`, the server runs the malicious PHP code inside it.
 
-- What you think: "This is a picture file (ends in `.png`), so it should just be displayed as an image."
-- What the server thinks (with `".+\.php"`): "This filename contains `.php` in it, so I'll run it as PHP code!"
-
-So even though the file looks like a `.png`, the server runs the malicious PHP code inside it.
-
-**The fix** : add a `$` symbol — `".+\.php$"`
-- The `$` means "THE END." Now it only matches files that end with `.php` and nothing after.
+**The fix** : add a `$` symbol — `".+\.php$"`. The `$` means "THE END." Now it only matches files that end with `.php` and nothing after.
 
 ---
 
@@ -89,7 +81,7 @@ The shell uploads cleanly. Trigger it:
 http://10.129.5.121/images/uploads/ws.php.png?cmd=whoami
 ```
 
-Commands run as `www-data` — grab a shell and stabilize with the python pty library.
+Commands run as `www-data` — grab a shell and stabilize it with the python pty library.
 
 # User
 
@@ -145,10 +137,7 @@ find / -perm -4000 -exec ls -l {} \; 2>/dev/null
 sysinfo
 ```
 
-It prints **Hardware info**, **Disk info**, **CPU info**, **Memory info** — `strings` reveals which linux commands it shells out to for each. We just need a binary with one of those names:
-
-- Create a file carrying the payload, named exactly like the binary, in `/tmp`
-- Add `/tmp` to the front of `$PATH`
+It prints **Hardware info**, **Disk info**, **CPU info**, **Memory info** — `strings` reveals which linux commands it shells out to for each. We just need a binary with one of those names: create a file carrying the payload, named exactly like the binary, in `/tmp`, and add `/tmp` to the front of `$PATH`.
 
 > Note : `/bin/bash -p` as a payload was tried but unstable
 
