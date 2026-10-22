@@ -10,11 +10,8 @@ tags:
 
 # Initial Recon
 
-```bash
-nmap -p22,8000 -A -oN scan_results.txt 10.10.11.82
-```
-
-```text
+```bash 
+# Nmap 7.95 scan initiated Sat Nov  1 07:30:13 2025 as: /usr/lib/nmap/nmap -p22,8000 -A -oN scan_results.txt 10.10.11.82
 Nmap scan report for 10.10.11.82
 Host is up (0.40s latency).
 
@@ -43,7 +40,6 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Sat Nov  1 07:30:38 2025 -- 1 IP address (1 host up) scanned in 25.19 seconds
 ```
-
 The web app on port `8000` was a code editor. Source review of `app.py` showed the `/run_code` endpoint used **js2py** to evaluate submitted JavaScript.
 
 # User
