@@ -56,20 +56,20 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ## FTP enumeration
 
-Anonymous login surfaced two directories — but downloaded files came out corrupted. Switching to **binary** mode (or FileZilla) fixes it:
+Anonymous login surfaced two directories, but the downloaded files came out corrupted. Switching to **binary** mode (or using FileZilla) fixes that:
 
 ```sh
 ftp anonymous@10.129.35.246
 > binary
 ```
 
-One of the files was a Microsoft Access database. Extracted its tables:
+One of the files was a Microsoft Access database, so I extracted its tables:
 
 ```text
 mdb-tables backup.mdb
 ```
 
-Dumped the `auth_user` table for rows and columns:
+Exporting the `auth_user` table gave me the rows and columns:
 
 ```text
 mdb-export auth_user backup.mdb
@@ -83,15 +83,15 @@ The engineer password unlocked a zip containing **Access Control.pst** — an Ou
 lspst Access\ Control.pst
 ```
 
-`readpst` didn't cooperate, so the exported **Access Control.mbox** was read directly — revealing:
+`readpst` didn't cooperate, so I read the exported **Access Control.mbox** directly instead — it revealed:
 
 `security : 4Cc3ssC0ntr0ller`
 
-Logged in over telnet for an unstable shell — a reverse shell provided a proper one and the user flag.
+Logging in over telnet gave a working but unstable shell, so I swapped it for a reverse shell — and with it, the user flag.
 
 ## runas abuse
 
-A hidden `Desktop` directory under the Public user held a linked file: `ZKAccess3.5 Security System.lnk`:
+A hidden `Desktop` directory under the Public profile held a shortcut: `ZKAccess3.5 Security System.lnk`:
 
 ```powershell
 type 'ZKAccess3.5 Security System.lnk'
@@ -136,7 +136,7 @@ runas /noprofile /savecred /user:Administrator "cmd.exe /C copy C:\Users\Adminis
 - `/savecred` - use the stored credentials
 - `/user:<username>` - use the stored credential of mentioned user
 
-The copied flag file couldn't be opened directly — so append it to a readable file instead:
+The copied flag file couldn't be opened directly, so instead I appended it to a readable file:
 
 ```powershell
 "root flag" > test.txt
