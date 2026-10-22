@@ -81,7 +81,7 @@ Shell captured on the listener.
 
 ## Credential Recovery
 
-System users enumerated:
+System users on the box:
 
 ```text
 root:x:0:0:root:/root:/bin/bash
@@ -89,7 +89,7 @@ marco:x:1000:1000:marco:/home/marco:/bin/bash
 app:x:1001:1001:,,,:/home/app:/bin/bash
 ```
 
-An `users.db` SQLite database contained unsalted password hashes:
+A `users.db` SQLite database contained unsalted password hashes:
 
 ```text
 Username: dante
@@ -102,13 +102,13 @@ Username: marco
 Password Hash: 649c9d65a206a75f5abe509fe128bce5
 ```
 
-`marco`'s hash was cracked:
+Cracking `marco`'s hash gave up the plaintext:
 
 ```text
 marco : sweetangelbabylove
 ```
 
-SSH access obtained.
+That was enough to log in over SSH.
 
 # Root
 
@@ -124,7 +124,7 @@ optional arguments:
 --dump DUMP           Dump a specific file to stdout (full path given by --ls), use with --dump [file]
 ```
 
-The config's `paths:` was modified to `/root` and saved as `new.conf`:
+The config's `paths:` entry was changed to `/root` and saved as `new.conf`:
 
 ```yaml
 repos:
