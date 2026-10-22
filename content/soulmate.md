@@ -12,17 +12,44 @@ tags:
 
 `nmap` exposed SSH, HTTP, and an Erlang Port Mapper Daemon:
 
-```bash
-nmap -p22,80,4369 -A -oN scan_results.txt 10.10.11.86
-```
+```bash 
+# Nmap 7.95 scan initiated Thu Oct 30 14:27:13 2025 as: /usr/lib/nmap/nmap -p22,80,4369 -A -oN scan_results.txt 10.10.11.86
+Nmap scan report for soulmate.htb (10.10.11.86)
+Host is up (0.39s latency).
 
-```text
 PORT     STATE SERVICE VERSION
-22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.13
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.13 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f (ECDSA)
+|_  256 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 (ED25519)
 80/tcp   open  http    nginx 1.18.0 (Ubuntu)
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-title: Soulmate - Find Your Perfect Match
 4369/tcp open  epmd    Erlang Port Mapper Daemon
-```
+| epmd-info: 
+|   epmd_port: 4369
+|   nodes: 
+|_    ssh_runner: 44543
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|router
+Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 4.15 - 5.19, Linux 5.0 - 5.14, MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Network Distance: 2 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
+TRACEROUTE (using port 443/tcp)
+HOP RTT       ADDRESS
+1   383.41 ms 10.10.14.1
+2   383.49 ms soulmate.htb (10.10.11.86)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Oct 30 14:27:40 2025 -- 1 IP address (1 host up) scanned in 26.97 seconds
+```
 The web application on port `80` was a dating site titled **Soulmate - Find Your Perfect Match**. The textarea was tested for XSS — not vulnerable.
 
 Subdomain enumeration with `ffuf` surfaced `ftp.soulmate.htb`:
