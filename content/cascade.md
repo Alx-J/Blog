@@ -128,7 +128,7 @@ Basic enum as s.smith showed a script called `MapAuditDrive.vbs` runs whenever s
 *Evil-WinRM* PS C:\Users\s.smith\Documents> net user s.smith
 ```
 
-Remembering the `Audit$` share from earlier — s.smith's creds open it this time:
+Remembering the `Audit$` share from earlier, s.smith's creds open it this time:
 
 ```text
 audit share
@@ -153,14 +153,7 @@ audit share
 
 dnSpy is a .NET debugger and assembly editor — inspect, debug, and modify .NET applications without the source code.
 
-Open the exe, hit `MainModule`, and the decryption key is sitting right there: `c4scadek3y654321`. The decryption calls into a `Crypto` function from `CascCrypto.dll` — open that library and the algorithm lays itself out:
-
-- **aes** blocksize
-- **aes** keysize
-- **IV** string
-- **key**
-- cipher mode => **CBC**
-- final output **base64** encoded
+Open the exe, hit `MainModule`, and the decryption key is sitting right there: `c4scadek3y654321`. The decryption calls into a `Crypto` function from `CascCrypto.dll` — open that library and the algorithm lays itself out: AES blocksize, AES keysize, an IV string, a key, CBC cipher mode, and base64 encoded final output.
 
 `pyaes` (pure-python AES) does the rest:
 
@@ -200,15 +193,13 @@ Gained `root`
 
 ## Additional info
 
-When searching for specific deleted objects, narrow the query:
-
-- Only list the users
+When searching for specific deleted objects, narrow the query. To list only the users:
 
 ```powershell
 Get-ADObject -ldapfilter "(&(objectclass=user)(isDeleted=TRUE))" -IncludeDeletedObjects
 ```
 
-- Only list the properties of a specific username
+Or to list the properties of a specific username:
 
 ```powershell
 Get-ADObject -ldapfilter "(&(objectclass=user)(DisplayName=TempAdmin)(isDeleted=TRUE))" -IncludeDeletedObjects -Properties *
