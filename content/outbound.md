@@ -17,10 +17,7 @@ tyler : LhKL1o9Nm3X2
 ```
 
 ```bash
-nmap -p22,80 -A -oN scan_results.txt 10.10.11.77
-```
-
-```text
+# Nmap 7.95 scan initiated Tue Nov  4 14:17:43 2025 as: /usr/lib/nmap/nmap -p22,80 -A -oN scan_results.txt 10.10.11.77
 Nmap scan report for outbound.htb (10.10.11.77)
 Host is up (0.60s latency).
 
@@ -48,7 +45,6 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Tue Nov  4 14:18:26 2025 -- 1 IP address (1 host up) scanned in 42.87 seconds
 ```
-
 The provided credentials didn't work for SSH but authenticated against **Roundcube** at `mail.outbound.htb`, running version **1.6.10**.
 
 # User
