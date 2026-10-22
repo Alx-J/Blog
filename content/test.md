@@ -1,0 +1,1 @@
+only closing tag </script> here
