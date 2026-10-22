@@ -57,13 +57,13 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Mon Sep  1 03:06:55 2025 -- 1 IP address (1 host up) scanned in 157.62 seconds
 ```
 
-Both `editor.htb` and port `8080` resolved to the same application:
+Both `editor.htb` and port `8080` served the same application:
 
 ```text
 http://10.10.11.80:8080/xwiki/bin/view/Main/
 ```
 
-The instance ran **XWiki version 15.10.8** — vulnerable to **CVE-2025-24893**.
+The instance ran **XWiki version 15.10.8**, which is vulnerable to **CVE-2025-24893**.
 
 ## CVE
 
@@ -81,14 +81,14 @@ Received a shell as `xwiki`.
 
 ## Credential Reuse
 
-User enumeration from the compromised service:
+Enumerating users from the compromised service:
 
 ```text
 root:x:0:0:root:/root:/bin/bash
 oliver:x:1000:1000:,..:/home/oliver:/bin/bash
 ```
 
-Reviewing XWiki's configuration documentation led to `hibernate.cfg.xml` — which held a batch of datasource passwords. One of them belonged to `oliver`:
+Reviewing XWiki's configuration documentation led to `hibernate.cfg.xml`, which held a batch of datasource passwords. One of them belonged to `oliver`:
 
 ```text
 oliver : theEd1t0rTeam99
@@ -106,7 +106,7 @@ SUID binaries owned by root:
 find / -user root -perm -4000 -print 2>/dev/null
 ```
 
-**ndsudo** from the Netdata installation stood out — vulnerable to **CVE-2024-32019**, a PATH injection in its allowed-plugin lookup:
+**ndsudo** from the Netdata installation stood out — it's vulnerable to **CVE-2024-32019**, a PATH injection in its allowed-plugin lookup:
 
 - https://github.com/netdata/netdata/security/advisories/GHSA-pmhq-4cxq-wj93
 - https://github.com/AzureADTrent/CVE-2024-32019-POC
