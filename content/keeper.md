@@ -40,10 +40,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Fri Sep 25 04:37:39 2026 -- 1 IP address (1 host up) scanned in 44.59 seconds
 ```
 
-On port 80 -> link to a subdomain:
-- add it to hosts and visit the subdomain
-
-- `tickets.keeper.htb`
+Port 80 holds a link to the subdomain `tickets.keeper.htb` — add it to hosts and visit the subdomain.
 
 Google search revealed **Request Tracker's default password**:
 
@@ -51,9 +48,7 @@ Google search revealed **Request Tracker's default password**:
 
 # User
 
-- Admin -> Users -> Select
-
-Select `lnorgaard` and reveal the password of the user:
+Navigate to Admin -> Users -> Select, pick `lnorgaard`, and reveal the password of the user:
 
 > `lnorgaard - Welcome2023!`
 
@@ -63,22 +58,17 @@ Gained user shell
 
 In the home directory of the user `lnorgaard` there's a zip file **RT30000.zip**.
 
-Either unzip it on the target machine or download it for more operations:
-- Anyway, we set up a python server and downloaded the zip file:
+Either unzip it on the target machine or download it for more operations — anyway, we set up a python server and downloaded the zip file:
 
 ```sh
 unzip RT30000.zip
 ```
 
-Two files extracted from the zip:
-- `KeePassDumpFull.dmp`
-- `passcodes.kdbx`
+Two files extracted from the zip: `KeePassDumpFull.dmp` and `passcodes.kdbx`.
 
 > **Note**: if you can't get the **kdbx** to open in **GUI**, use the **keepass client** version: `kpcli --kdb=yourdatabase.kdb`
 
-For the kdbx master key we can brute force, but bruteforce didn't work here.
-
-- We found a CVE where we can gain the **master key** by exploiting the **memory dump** of the **keepass**:
+For the kdbx master key we can brute force, but bruteforce didn't work here. We found a CVE where we can gain the **master key** by exploiting the **memory dump** of the **keepass**:
 
 > CVE-2023-32784 : https://github.com/vdohney/keepass-password-dumper/
 
@@ -88,14 +78,13 @@ We require **dotnet** for this (Windows or linux both work).
 
 > https://learn.microsoft.com/en-us/dotnet/core/install/linuxhttps://learn.microsoft.com/en-us/dotnet/core/install/linux
 
-- Download the package for linux from above link
-- Download the installation script:
+Download the package for linux from above link, then download the installation script:
 
 ```sh
 wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh 
 ```
 
-To install latest frameworks:
+To install the latest frameworks:
 
 ```sh
 ./dotnet-install.sh --version latest
@@ -120,7 +109,7 @@ export PATH="$PATH:$HOME/.dotnet"
 dotnet run ../KeePassDumpFull.dmp
 ```
 
-We faced an error: it **requires 7.0.0** runtime framework:
+Running it failed because it **requires 7.0.0** runtime framework:
 
 ```sh
 ./dotnet-install.sh --channel 7.0 --runtime dotnet
@@ -132,17 +121,11 @@ Now execute **dotnet** again and we get a string of characters:
 Combined: ●{ø, Ï, ,, l, `, -, ', ], §, A, I, :, =, _, c, M}dgrød med fløde
 ```
 
-We got most of the characters, but:
-- 1st character unknown
-- 2nd character one from the possibilities
+We got most of the characters, but the 1st character is unknown and the 2nd is one of the possibilities. Searching `dgrød med fløde` on google shows it's the name of a Danish red berry pudding which is `rødgrød med fløde`.
 
-`dgrød med fløde` -> Searched google:
+Gained the **master key** to the `kdbx`.
 
-It's the name of a Danish red berry pudding which is `rødgrød med fløde`
-
-Gained the **master key** to the `kdbx`
-
-There's a Putty key file of `ssh-rsa` in the **Notes** of root in the Network group.
+There's a PuTTY key file of `ssh-rsa` in the **Notes** of root in the Network group.
 
 ---
 > **PuTTY Key File**: Private SSH key in `.ppk` format used for password-less authentication to remote servers via PuTTY client.
@@ -150,14 +133,12 @@ There's a Putty key file of `ssh-rsa` in the **Notes** of root in the Network gr
 > **PuTTYgen**: Utility that generates, converts, and manages PuTTY key files between formats (OpenSSH ↔ `.ppk`), with optional passphrase protection.
 
 ---
-- Copy the key and save as `ssh_key_file`
-- Using puttygen we can extract the private key from the file:
+Copy the key and save as `ssh_key_file` — using puttygen we can extract the private key from the file:
 
 ```sh
 puttygen ssh_key_file -O private-openssh -o id_rsa-root
 ```
 
-- `-O` - file type
-- `-o` - Output name 
+Here `-O` sets the file type and `-o` names the output.
 
 Gained `root`
