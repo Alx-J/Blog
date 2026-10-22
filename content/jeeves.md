@@ -58,26 +58,25 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Thu Sep  3 10:54:18 2026 -- 1 IP address (1 host up) scanned in 67.53 seconds
 ```
 
-- Port **80** serves an "Ask Jeeves" search page
-- Port **50000** runs Jetty but 404s — no index page
+Port **80** serves an "Ask Jeeves" search page, while port **50000** runs Jetty but 404s with no index page.
 
-Brute for it:
+So we brute-force it:
 
 ```sh
 feroxbuster --url http://jeeves.htb:50000/ -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
 ```
 
-`/askjeeves` -> **Jenkins ver. 2.87**
+`/askjeeves` reveals **Jenkins ver. 2.87**.
 
-No auth needed — create a Freestyle project -> Build -> Add build step -> **Build Now**:
+No auth needed — create a Freestyle project, then Build -> Add build step -> **Build Now**:
 
 > https://www.toolsqa.com/postman/configure-jenkins-job-to-run-batch-command/
 
-Click the build and open the console output to confirm it ran. Shell as **kohsuke**.
+Open the build's console output to confirm it ran — we now have a shell as **kohsuke**.
 
 # User
 
-In kohsuke's Documents sits a keepass db — `CEH.kdbx`.
+In kohsuke's Documents sits a KeePass database: `CEH.kdbx`.
 
 Download it with impacket's `smbserver`:
 
@@ -85,7 +84,7 @@ Download it with impacket's `smbserver`:
 keepassxc CEH.kdbx
 ```
 
-The file is **password protected** — it needs the **master key** to open. Convert **keepass** format **to john** hash format first:
+The file is **password protected** — it needs a **master key** to open. Convert the **keepass** format to a **john** hash first:
 
 ```sh
 keepass2john CEH.kdbx > keepasshash 
@@ -95,12 +94,9 @@ john --fomat=keepass --wordlist=/usr/share/wordlists/rockyou.txt keepasshash
 
 > Master key - `moonshine1`
 
-Opening it yields just a NTLM hash — `aad3b435b51404eeaad3b435b51404ee:e0fb1fb85756c24235ff238cbe81fe00` — suspected to be the administrator's.
+Opening it yields a single NTLM hash — `aad3b435b51404eeaad3b435b51404ee:e0fb1fb85756c24235ff238cbe81fe00` — believed to be the administrator's.
 
-Use **pth-winexe** to pass the hash (-PassTheHash-):
-
-- `impacket-wmiexec` didn't work even though it uses smb
-- `evil-winrm` won't work — no winrms service running on the target
+`impacket-wmiexec` didn't work despite speaking SMB, and `evil-winrm` was out — no winrms service running on the target, so it's **pth-winexe** to pass the hash (-PassTheHash-):
 
 ```sh
 pth-winexe -U jenkins/administrator //10.129.228.112 cmd.exe
@@ -111,8 +107,9 @@ pth-winexe -U jenkins/administrator //10.129.228.112 cmd.exe
 ```cmd
 dir /A /R
 ```
+
 - `/A` - list hidden files
-- `/R` - list files hidden inside the files using data stream method
+- `/R` - list data streams hidden inside other files
 
 The flag is stashed in an NTFS alternate data stream of `hm.txt`:
 
