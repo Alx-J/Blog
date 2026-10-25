@@ -4,7 +4,7 @@ date: 2025-01-21
 description: Active Directory compromise on a Windows target involving SMB share enumeration, credential extraction from a corrupted Excel archive, ACL abuse against `ca_svc`, and AD CS template exploitation to obtain Administrator access.
 tags:
   - htb
-  - Medium
+  - Easy
   - Windows
 ---
 
