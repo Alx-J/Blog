@@ -1,10 +1,10 @@
 ---
 title: Blackfield
 date: 2026-09-01
-description: Medium Windows AD box forcing a password reset on a bloodhound-linked account, cracking an lsass dump for the backup service account, and using SeBackupPrivilege with wbadmin to extract NTDS.dit.
+description: Hard Windows AD box forcing a password reset on a bloodhound-linked account, cracking an lsass dump for the backup service account, and using SeBackupPrivilege with wbadmin to extract NTDS.dit.
 tags:
   - htb
-  - Medium
+  - Hard
   - Windows
 ---
 
