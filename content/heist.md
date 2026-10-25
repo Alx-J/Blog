@@ -1,10 +1,10 @@
 ---
 title: Heist
 date: 2026-08-19
-description: Medium Windows machine leaking Cisco IOS password hashes from a support portal attachment — cracking them to reach WinRM, then pulling administrator credentials out of a Firefox process dump.
+description: Easy Windows machine leaking Cisco IOS password hashes from a support portal attachment — cracking them to reach WinRM, then pulling administrator credentials out of a Firefox process dump.
 tags:
   - htb
-  - Medium
+  - Easy
   - Windows
 ---
 
