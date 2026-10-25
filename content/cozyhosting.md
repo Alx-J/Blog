@@ -1,10 +1,10 @@
 ---
 title: CozyHosting
 date: 2026-09-29
-description: Medium Linux box grabbing kanderson's session from /actuator/sessions, blind username command injection with ${IFS} for an app shell, and abusing sudo'd ssh ProxyCommand for root.
+description: Easy Linux box grabbing kanderson's session from /actuator/sessions, blind username command injection with ${IFS} for an app shell, and abusing sudo'd ssh ProxyCommand for root.
 tags:
   - htb
-  - Medium
+  - Easy
   - Linux
 ---
 
