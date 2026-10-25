@@ -1,10 +1,10 @@
 ---
 title: Usage
 date: 2026-10-03
-description: Medium Linux box sqlmap-injecting the forgot-password email field for admin creds, uploading a disguised revshell through a Laravel file upload bug, and abusing a 7za wildcard symlink in usage_management for root's key.
+description: Easy Linux box sqlmap-injecting the forgot-password email field for admin creds, uploading a disguised revshell through a Laravel file upload bug, and abusing a 7za wildcard symlink in usage_management for root's key.
 tags:
   - htb
-  - Medium
+  - Easy
   - Linux
 ---
 
