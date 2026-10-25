@@ -1,10 +1,10 @@
 ---
 title: Help
 date: 2026-07-28
-description: Medium Linux box extracting HelpDeskZ staff credentials through a binary-search boolean SQLi, then escalating on a 4.4.0 kernel with the CVE-2017-16995 netfilter exploit.
+description: Easy Linux box extracting HelpDeskZ staff credentials through a binary-search boolean SQLi, then escalating on a 4.4.0 kernel with the CVE-2017-16995 netfilter exploit.
 tags:
   - htb
-  - Medium
+  - Easy
   - Linux
 ---
 
