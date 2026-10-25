@@ -1,10 +1,10 @@
 ---
 title: Magic
 date: 2026-08-31
-description: Easy Linux box slipping a PHP webshell past an Apache FilesMatch rule with a PNG magic-number header, forwarding localhost MySQL through chisel, and hijacking a SUID sysinfo PATH lookup.
+description: Medium Linux box slipping a PHP webshell past an Apache FilesMatch rule with a PNG magic-number header, forwarding localhost MySQL through chisel, and hijacking a SUID sysinfo PATH lookup.
 tags:
   - htb
-  - Easy
+  - Medium
   - Linux
 ---
 
