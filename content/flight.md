@@ -1,10 +1,10 @@
 ---
 title: Flight
 date: 2026-09-12
-description: Medium Windows AD chain from an LFI on a school subdomain — NTLM theft into a writable share, sliver C2 with RunasCs lateral movement, and a virtual-account Rubeus TGT for DCSync.
+description: Hard Windows AD chain from an LFI on a school subdomain — NTLM theft into a writable share, sliver C2 with RunasCs lateral movement, and a virtual-account Rubeus TGT for DCSync.
 tags:
   - htb
-  - Medium
+  - Hard
   - Windows
 ---
 
